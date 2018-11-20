@@ -7,4 +7,12 @@ class ActiveSupport::TestCase
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
+  def encode_bbb_params(api_method, query_string)
+    checksum = Digest::SHA1.hexdigest("#{api_method}#{query_string}#{ENV.fetch('BBB_SECRET')}")
+    if query_string.blank?
+      "checksum=#{checksum}"
+    else
+      "#{query_string}&checksum=#{checksum}"
+    end
+  end
 end
