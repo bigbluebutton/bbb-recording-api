@@ -1,0 +1,2 @@
+class PlaybackFormat < ApplicationRecord
+end
