@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_20_132251) do
+ActiveRecord::Schema.define(version: 2018_11_20_162443) do
 
   create_table "metadata", force: :cascade do |t|
     t.integer "recording_id"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 2018_11_20_132251) do
     t.string "format"
     t.string "url"
     t.integer "length"
+    t.integer "processing_time"
     t.index ["recording_id"], name: "index_playback_formats_on_recording_id"
   end
 
@@ -31,6 +32,13 @@ ActiveRecord::Schema.define(version: 2018_11_20_132251) do
     t.string "record_id"
     t.string "meeting_id"
     t.string "name"
+    t.boolean "published"
+    t.integer "participants"
+    t.string "state"
+    t.datetime "starttime"
+    t.datetime "endtime"
+    t.index ["meeting_id"], name: "index_recordings_on_meeting_id"
+    t.index ["record_id"], name: "index_recordings_on_record_id"
   end
 
 end
