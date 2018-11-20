@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 2018_11_20_132251) do
 
   create_table "playback_formats", force: :cascade do |t|
     t.integer "recording_id"
-    t.string "type"
+    t.string "format"
     t.string "url"
     t.integer "length"
     t.index ["recording_id"], name: "index_playback_formats_on_recording_id"
