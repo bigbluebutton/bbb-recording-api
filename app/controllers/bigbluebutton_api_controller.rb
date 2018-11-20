@@ -32,7 +32,7 @@ class BigbluebuttonApiController < ApplicationController
 
     query_string = request.query_string.gsub(/^checksum=#{params[:checksum]}&?/, '')
     query_string = query_string.gsub(/&?checksum=#{params[:checksum]}/, '')
-    our_checksum = Digest::SHA1.hexdigest(action_name + query_string + ENV.fetch('BIGBLUEBUTTON_SECRET'))
+    our_checksum = Digest::SHA1.hexdigest(action_name + query_string + ENV.fetch('BBB_SECRET'))
     return if our_checksum == params[:checksum]
 
     raise ApiError.new('checksumError', 'You did not pass the checksum security check')
