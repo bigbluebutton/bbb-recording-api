@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_20_162443) do
+ActiveRecord::Schema.define(version: 2018_11_20_184338) do
 
   create_table "metadata", force: :cascade do |t|
     t.integer "recording_id"
@@ -39,6 +39,15 @@ ActiveRecord::Schema.define(version: 2018_11_20_162443) do
     t.datetime "endtime"
     t.index ["meeting_id"], name: "index_recordings_on_meeting_id"
     t.index ["record_id"], name: "index_recordings_on_record_id"
+  end
+
+  create_table "thumbnails", force: :cascade do |t|
+    t.integer "playback_format_id"
+    t.integer "width"
+    t.integer "height"
+    t.string "alt"
+    t.string "url"
+    t.index ["playback_format_id"], name: "index_thumbnails_on_playback_format_id"
   end
 
 end
