@@ -5,5 +5,4 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     get bigbluebutton_api_get_recordings_url
     assert_response :success
   end
-
 end

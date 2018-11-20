@@ -1,0 +1,22 @@
+inherit_mode:
+  merge:
+    - Exclude
+AllCops:
+  Exclude:
+    - db/schema.rb
+Metrics/BlockLength:
+  Exclude:
+    - "**/*.builder"
+Metrics/LineLength:
+  Max: 132
+Naming/AccessorMethodName:
+  Exclude:
+    - app/controllers/bigbluebutton_api_controller.rb
+Rails:
+  Enabled: true
+Rails/CreateTableWithTimestamps:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
