@@ -31,8 +31,15 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'response>returncode', 'SUCCESS'
     assert_select 'response>recordings>recording', 1
-    assert_select 'recording>recordID', r.record_id
-    assert_select 'recording>meetingID', r.meeting_id
+    assert_select 'response>recordings>recording' do
+      assert_select 'recordID', r.record_id
+      assert_select 'meetingID', r.meeting_id
+      assert_select 'name', r.name
+      assert_select 'published', r.published
+      assert_select 'startTime', (r.starttime.to_r * 1000).to_i.to_s
+      assert_select 'endTime', (r.endtime.to_r * 1000).to_i.to_s
+      assert_select 'participants', r.participants.to_s
+    end
     assert_select 'playback>format', r.playback_formats.count
   end
 

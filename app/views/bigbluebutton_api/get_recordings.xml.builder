@@ -6,11 +6,10 @@ xml.response do
         xml.recordID recording.record_id
         xml.meetingID recording.meeting_id
         xml.name recording.name
-        #xml.published recording.published_v2.to_s
-        #xml.protected recording.protected.to_s
-        #xml.startTime (recording.start_time.to_f * 1000).to_i
-        #xml.endTime (recording.end_time.to_f * 1000).to_i
-        #xml.participants recording.participants unless recording.participants.nil?
+        xml.published recording.published
+        xml.startTime (recording.starttime.to_r * 1000).to_i
+        xml.endTime (recording.endtime.to_r * 1000).to_i
+        xml.participants recording.participants unless recording.participants.nil?
         xml.metadata do
           recording.metadata.each do |metadatum|
             if metadatum.value.blank?
