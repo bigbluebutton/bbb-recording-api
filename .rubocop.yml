@@ -4,6 +4,8 @@ inherit_mode:
 AllCops:
   Exclude:
     - db/schema.rb
+Metrics/AbcSize:
+  Max: 30
 Metrics/BlockLength:
   Exclude:
     - "**/*.builder"

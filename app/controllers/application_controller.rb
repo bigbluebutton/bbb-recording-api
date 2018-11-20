@@ -1,4 +1,4 @@
 class ApplicationController < ActionController::API
   include ActionView::Layouts
-  include ActionController::ImplicitRender
+#  include ActionController::ImplicitRender
 end
