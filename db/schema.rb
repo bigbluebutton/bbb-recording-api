@@ -10,6 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 2018_11_20_132251) do
+
+  create_table "metadata", force: :cascade do |t|
+    t.integer "recording_id"
+    t.string "key"
+    t.string "value"
+    t.index ["recording_id"], name: "index_metadata_on_recording_id"
+  end
+
+  create_table "playback_formats", force: :cascade do |t|
+    t.integer "recording_id"
+    t.string "type"
+    t.string "url"
+    t.integer "length"
+    t.index ["recording_id"], name: "index_playback_formats_on_recording_id"
+  end
+
+  create_table "recordings", force: :cascade do |t|
+    t.string "record_id"
+    t.string "meeting_id"
+    t.string "name"
+  end
 
 end
