@@ -11,7 +11,6 @@ class Recording < ApplicationRecord
     where(query_string, *rid_prefixes)
   }
 
-  # TODO: break if success != true?
   def self.sync_from_redis(message)
     header = message["header"]
     payload = message["payload"]
@@ -22,7 +21,6 @@ class Recording < ApplicationRecord
 
     attrs[:meeting_id] = payload["external_meeting_id"]
 
-    # processing|processed|published|unpublished|deleted
     case header["name"]
     when /^archive_/, /^sanity_/, "process_started"
       attrs[:state] = 'processing'
@@ -30,8 +28,6 @@ class Recording < ApplicationRecord
       attrs[:state] = 'processing'
     when "publish_ended"
       attrs[:state] = 'published'
-      # attrs[:size] = payload["size"]
-      # attrs[:raw_size] = payload["raw_size"]
       attrs[:starttime] = payload["start_time"]
       attrs[:endtime] = payload["end_time"]
     end
@@ -53,13 +49,11 @@ class Recording < ApplicationRecord
       playbacks.each do |playback|
         format = PlaybackFormat.find_or_create_by(recording: recording, format: playback["format"])
         format.update_attributes(
-          url: playback["link"],
+          url: PlaybackFormat.parse_url(playback["link"]),
           length: playback["duration"],
           processing_time: playback["processing_time"]
         )
       end
-
-      # TODO: thumbnails
     end
 
     recording.update_attributes(attrs)
