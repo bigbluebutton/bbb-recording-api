@@ -17,10 +17,11 @@ target_events = [
   "publish_started",
   "publish_ended"
 ]
+redis_channel = "bigbluebutton:from-rap"
 
 redis = Redis.new(host: ENV["BBB_REDIS_HOST"], port: ENV["BBB_REDIS_PORT"], db: ENV["BBB_REDIS_DB"])
 
-redis.subscribe("bigbluebutton:from-rap") do |on|
+redis.subscribe(redis_channel) do |on|
   on.subscribe do |channel, subscriptions|
     Rails.logger.info "Subscribed to ##{channel} (#{subscriptions} subscriptions)"
   end

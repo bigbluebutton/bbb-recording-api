@@ -34,6 +34,7 @@ class Recording < ApplicationRecord
       attrs[:state] = 'published'
       attrs[:starttime] = Time.at(payload["start_time"]/1000)
       attrs[:endtime] = Time.at(payload["end_time"]/1000)
+      attrs[:participants] = payload["participants"]
       attrs[:published] = true
     end
 

@@ -432,7 +432,6 @@ class RecordingTest < ActiveSupport::TestCase
           isBreakout: "false",
           meetingId: "Not Fred's Room"
         },
-        raw_size: 8166022,
         start_time: 1542719370284,
         end_time: 1542719443220,
         workflow: "presentation",
