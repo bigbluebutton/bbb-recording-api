@@ -36,6 +36,7 @@ class Recording < ApplicationRecord
       attrs[:endtime] = Time.at(payload["end_time"]/1000)
       attrs[:participants] = payload["participants"]
       attrs[:published] = true
+      # attrs[:raw_size] = payload["raw_size"]
     end
 
     if payload.has_key?("metadata")
@@ -65,15 +66,23 @@ class Recording < ApplicationRecord
           images = [images] unless images.is_a?(Array)
 
           images.each do |image|
+            # newer versions of bbb have a different format
+            # old: {"images"=>{"image"=>"https://....png"}}
+            # new: {"images"=>{"image"=>{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}}}
+            if image["image"].is_a?(Hash)
+              image = image["image"]
+              image["image"] = image["link"]
+            end
+
             thumb = Thumbnail.find_or_create_by(
               playback_format: format,
               url: ::BigBlueButton.remove_domain(image["image"])
             )
-            # thumb.update_attributes(
-            #   width: image["width"],
-            #   height: image["height"],
-            #   alt: image["alt"]
-            # )
+            thumb.update_attributes(
+              width: image["width"],
+              height: image["height"],
+              alt: image["alt"]
+            )
           end
         end
       end
