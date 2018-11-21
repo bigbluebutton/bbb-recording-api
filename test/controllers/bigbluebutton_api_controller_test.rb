@@ -36,6 +36,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
       assert_select 'meetingID', r.meeting_id
       assert_select 'name', r.name
       assert_select 'published', r.published
+      assert_select 'state', r.state
       assert_select 'startTime', (r.starttime.to_r * 1000).to_i.to_s
       assert_select 'endTime', (r.endtime.to_r * 1000).to_i.to_s
       assert_select 'participants', r.participants.to_s
