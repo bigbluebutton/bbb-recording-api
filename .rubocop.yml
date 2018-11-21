@@ -9,9 +9,16 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   Exclude:
     - "**/*.builder"
+Metrics/CyclomaticComplexity:
+  Max: 12
 Metrics/LineLength:
   Max: 132
+Metrics/MethodLength:
+  Max: 20
 Naming/AccessorMethodName:
+  Exclude:
+    - app/controllers/bigbluebutton_api_controller.rb
+Naming/MethodName:
   Exclude:
     - app/controllers/bigbluebutton_api_controller.rb
 Rails:
