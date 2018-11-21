@@ -21,17 +21,20 @@ class Recording < ApplicationRecord
     record_id = payload["record_id"]
     recording = Recording.find_or_create_by(record_id: record_id)
 
-    attrs[:meeting_id] = payload["external_meeting_id"]
+    attrs[:meeting_id] = payload["external_meeting_id"] if payload.has_key?("external_meeting_id")
 
     case header["name"]
     when /^archive_/, /^sanity_/, "process_started"
       attrs[:state] = 'processing'
+      attrs[:published] = false
     when "process_ended", "publish_started"
-      attrs[:state] = 'processing'
+      attrs[:state] = 'processed'
+      attrs[:published] = false
     when "publish_ended"
       attrs[:state] = 'published'
-      attrs[:starttime] = payload["start_time"]
-      attrs[:endtime] = payload["end_time"]
+      attrs[:starttime] = Time.at(payload["start_time"]/1000)
+      attrs[:endtime] = Time.at(payload["end_time"]/1000)
+      attrs[:published] = true
     end
 
     if payload.has_key?("metadata")
