@@ -2,14 +2,14 @@ require 'test_helper'
 
 class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
   # getRecordings
-  test 'with no parameters returns checksum error' do
+  test 'getRecordings with no parameters returns checksum error' do
     get bigbluebutton_api_get_recordings_url
     assert_response :success
     assert_select 'response>returncode', 'FAILURE'
     assert_select 'response>messageKey', 'checksumError'
   end
 
-  test 'with invalid checksum returns checksum error' do
+  test 'getRecordings with invalid checksum returns checksum error' do
     get bigbluebutton_api_get_recordings_url, params: "checksum=#{'x' * 40}"
     assert_response :success
     assert_select 'response>returncode', 'FAILURE'
@@ -63,5 +63,36 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_select 'response>recordings>recording', 1
     assert_select 'recording>recordID', r.record_id
     assert_select 'recording>meetingID', r.meeting_id
+  end
+
+  # publishRecordings
+  test 'publishRecordings with no parameters returns checksum error' do
+    get bigbluebutton_api_publish_recordings_url
+    assert_response :success
+    assert_select 'response>returncode', 'FAILURE'
+    assert_select 'response>messageKey', 'checksumError'
+  end
+
+  test 'publishRecordings with invalid checksum returns checksum error' do
+    get bigbluebutton_api_publish_recordings_url, params: "checksum=#{'x' * 40}"
+    assert_response :success
+    assert_select 'response>returncode', 'FAILURE'
+    assert_select 'response>messageKey', 'checksumError'
+  end
+
+  test 'publishRecordings requires recordID parameter' do
+    params = encode_bbb_params('publishRecordings', { publish: 'true' }.to_query)
+    get bigbluebutton_api_publish_recordings_url, params: params
+    assert_response :success
+    assert_select 'response>returncode', 'FAILURE'
+    assert_select 'response>messageKey', 'missingParamRecordID'
+  end
+
+  test 'publishRecordings requires publish parameter' do
+    params = encode_bbb_params('publishRecordings', { recordID: recordings(:fred_room).record_id }.to_query)
+    get bigbluebutton_api_publish_recordings_url, params: params
+    assert_response :success
+    assert_select 'response>returncode', 'FAILURE'
+    assert_select 'response>messageKey', 'missingParamPublish'
   end
 end

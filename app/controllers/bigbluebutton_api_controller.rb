@@ -20,6 +20,21 @@ class BigbluebuttonApiController < ApplicationController
     render :get_recordings
   end
 
+  def publishRecordings
+    raise ApiError.new('missingParamRecordID', 'You must specify a recordID.') if params[:recordID].blank?
+    raise ApiError.new('missingParamPublish', 'You must specify a publish value true or false.') if params[:publish].blank?
+
+    publish = params[:publish].casecmp('true').zero?
+
+    query = Recording.where(record_id: params[:recordID].split(','), state: 'published')
+    raise APIError.new('notFound', 'We could not find recordings') if query.count.zero?
+
+    query.where.not(published: publish).update_all(published: publish)
+
+    @published = publish
+    render :publish_recordings
+  end
+
   private
 
   def api_error(exception)

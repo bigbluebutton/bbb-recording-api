@@ -1,11 +1,33 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 fred_room:
-  record_id: ffbfc4cc24428694e8b53a4e144f414052431693-1530718721124
   meeting_id: c637ba21adcd0191f48f5c4bf23fab0f96ed5c18
+  record_id: ffbfc4cc24428694e8b53a4e144f414052431693-1530718721124
   name: "Fred's Room"
   published: true
   participants: 3
   state: published
   starttime: "<%= Time.at(Rational(1530718721124,1000)).utc.strftime('%F %T.%L %:z') %>"
   endtime: "<%= Time.at(Rational(1530718810456,1000)).utc.strftime('%F %T.%L %:z') %>"
+
+<% (1..20).each do |num| %>
+bulk_room<%= num %>:
+  <% start_time = 1542807065000 + num * 60 * 1001 %>
+  meeting_id: bulk_room
+  record_id: 4288dc38f73bff2e3f2d455225d7bb652829a2ed-<%= start_time %>
+  name: "Bulk Room Session <%= num %>"
+  published: true
+  participants: <%= num %>
+  state: published
+  starttime: <%= start_time %>
+  endtime: <%= start_time + 45 * 60 * 1000 %>
+<% end %>
+
+published_false:
+  meeting_id: published_false
+  record_id: 13b3269ea933663ff78c7a24ca39897448517806-1542808333391
+  name: "Recording with published=false"
+  published: false
+  state: published
+  starttime: 1542808333391
+  endtime: 1542808562014

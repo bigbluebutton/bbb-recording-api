@@ -13,3 +13,13 @@ fred_room_presentation:
   url: /playback/presentation/2.0/playback.html?meetingId=ffbfc4cc24428694e8b53a4e144f414052431693-1530718721124
   length: 0
   processing_time: 7177
+
+<% (1..20).each do |num| %>
+bulk_room<%= num %>_presentation:
+  <% start_time = 1542807065000 + num * 60 * 1001 %>
+  recording: :bulk_room<%= num %>
+  format: presentation
+  url: /playback/presentation/2.0/playback.html?meetingId=6ecb02e5ca142a72aaa4bf60283cc42c2ea170bd-<%= start_time %>
+  length: 30
+  processing_time: <%= 30 * 60 * 1000 + num %>
+<% end %>
