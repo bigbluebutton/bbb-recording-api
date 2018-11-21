@@ -17,14 +17,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count" do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_nil Recording.last.meeting_id
-    assert_equal Recording.last.state, "processing"
-    assert_nil Recording.last.starttime
-    assert_nil Recording.last.endtime
-    assert_nil Recording.last.name
-    assert_nil Recording.last.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_nil target.meeting_id
+    assert_equal target.state, "processing"
+    assert_nil target.starttime
+    assert_nil target.endtime
+    assert_nil target.name
+    assert_nil target.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis updates an existent recording on archive_started' do
@@ -44,14 +44,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count", 0 do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, r.record_id
-    assert_equal Recording.last.meeting_id, r.meeting_id
-    assert_equal Recording.last.state, "processing"
-    assert_equal Recording.last.starttime, r.starttime
-    assert_equal Recording.last.endtime, r.endtime
-    assert_equal Recording.last.name, r.name
-    assert_equal Recording.last.participants, r.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: r.record_id)
+    assert_equal target.meeting_id, r.meeting_id
+    assert_equal target.state, "processing"
+    assert_equal target.starttime, r.starttime
+    assert_equal target.endtime, r.endtime
+    assert_equal target.name, r.name
+    assert_equal target.participants, r.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis creates a recording on archive_ended' do
@@ -73,14 +73,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count" do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processing"
-    assert_nil Recording.last.starttime
-    assert_nil Recording.last.endtime
-    assert_nil Recording.last.name
-    assert_nil Recording.last.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processing"
+    assert_nil target.starttime
+    assert_nil target.endtime
+    assert_nil target.name
+    assert_nil target.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis updates an existent recording on archive_ended' do
@@ -103,14 +103,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count", 0 do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, r.record_id
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processing"
-    assert_equal Recording.last.starttime, r.starttime
-    assert_equal Recording.last.endtime, r.endtime
-    assert_equal Recording.last.name, r.name
-    assert_equal Recording.last.participants, r.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: r.record_id)
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processing"
+    assert_equal target.starttime, r.starttime
+    assert_equal target.endtime, r.endtime
+    assert_equal target.name, r.name
+    assert_equal target.participants, r.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis creates a recording on sanity_started' do
@@ -130,14 +130,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count" do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processing"
-    assert_nil Recording.last.starttime
-    assert_nil Recording.last.endtime
-    assert_nil Recording.last.name
-    assert_nil Recording.last.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processing"
+    assert_nil target.starttime
+    assert_nil target.endtime
+    assert_nil target.name
+    assert_nil target.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis updates an existent recording on sanity_started' do
@@ -158,14 +158,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count", 0 do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, r.record_id
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processing"
-    assert_equal Recording.last.starttime, r.starttime
-    assert_equal Recording.last.endtime, r.endtime
-    assert_equal Recording.last.name, r.name
-    assert_equal Recording.last.participants, r.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: r.record_id)
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processing"
+    assert_equal target.starttime, r.starttime
+    assert_equal target.endtime, r.endtime
+    assert_equal target.name, r.name
+    assert_equal target.participants, r.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis creates a recording on sanity_ended' do
@@ -187,14 +187,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count" do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processing"
-    assert_nil Recording.last.starttime
-    assert_nil Recording.last.endtime
-    assert_nil Recording.last.name
-    assert_nil Recording.last.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processing"
+    assert_nil target.starttime
+    assert_nil target.endtime
+    assert_nil target.name
+    assert_nil target.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis updates an existent recording on sanity_ended' do
@@ -217,14 +217,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count", 0 do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, r.record_id
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processing"
-    assert_equal Recording.last.starttime, r.starttime
-    assert_equal Recording.last.endtime, r.endtime
-    assert_equal Recording.last.name, r.name
-    assert_equal Recording.last.participants, r.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: r.record_id)
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processing"
+    assert_equal target.starttime, r.starttime
+    assert_equal target.endtime, r.endtime
+    assert_equal target.name, r.name
+    assert_equal target.participants, r.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis creates a recording on process_started' do
@@ -245,14 +245,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count" do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processing"
-    assert_nil Recording.last.starttime
-    assert_nil Recording.last.endtime
-    assert_nil Recording.last.name
-    assert_nil Recording.last.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processing"
+    assert_nil target.starttime
+    assert_nil target.endtime
+    assert_nil target.name
+    assert_nil target.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis updates an existent recording on process_started' do
@@ -274,14 +274,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count", 0 do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, r.record_id
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processing"
-    assert_equal Recording.last.starttime, r.starttime
-    assert_equal Recording.last.endtime, r.endtime
-    assert_equal Recording.last.name, r.name
-    assert_equal Recording.last.participants, r.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: r.record_id)
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processing"
+    assert_equal target.starttime, r.starttime
+    assert_equal target.endtime, r.endtime
+    assert_equal target.name, r.name
+    assert_equal target.participants, r.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis creates a recording on process_ended' do
@@ -304,14 +304,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count" do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processed"
-    assert_nil Recording.last.starttime
-    assert_nil Recording.last.endtime
-    assert_nil Recording.last.name
-    assert_nil Recording.last.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processed"
+    assert_nil target.starttime
+    assert_nil target.endtime
+    assert_nil target.name
+    assert_nil target.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis updates an existent recording on process_ended' do
@@ -335,14 +335,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count", 0 do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, r.record_id
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processed"
-    assert_equal Recording.last.starttime, r.starttime
-    assert_equal Recording.last.endtime, r.endtime
-    assert_equal Recording.last.name, r.name
-    assert_equal Recording.last.participants, r.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: r.record_id)
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processed"
+    assert_equal target.starttime, r.starttime
+    assert_equal target.endtime, r.endtime
+    assert_equal target.name, r.name
+    assert_equal target.participants, r.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis creates a recording on publish_started' do
@@ -363,14 +363,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count" do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processed"
-    assert_nil Recording.last.starttime
-    assert_nil Recording.last.endtime
-    assert_nil Recording.last.name
-    assert_nil Recording.last.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processed"
+    assert_nil target.starttime
+    assert_nil target.endtime
+    assert_nil target.name
+    assert_nil target.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis updates an existent recording on publish_started' do
@@ -394,14 +394,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_difference "Recording.count", 0 do
       Recording.sync_from_redis(event)
     end
-    assert_equal Recording.last.record_id, r.record_id
-    assert_equal Recording.last.meeting_id, "Not Fred's Room"
-    assert_equal Recording.last.state, "processed"
-    assert_equal Recording.last.starttime, r.starttime
-    assert_equal Recording.last.endtime, r.endtime
-    assert_equal Recording.last.name, r.name
-    assert_equal Recording.last.participants, r.participants
-    assert_not Recording.last.published
+    target = Recording.find_by(record_id: r.record_id)
+    assert_equal target.meeting_id, "Not Fred's Room"
+    assert_equal target.state, "processed"
+    assert_equal target.starttime, r.starttime
+    assert_equal target.endtime, r.endtime
+    assert_equal target.name, r.name
+    assert_equal target.participants, r.participants
+    assert_not target.published
   end
 
   test '.sync_from_redis creates a recording on publish_ended' do
@@ -452,33 +452,28 @@ class RecordingTest < ActiveSupport::TestCase
       end
     end
 
-    r = Recording.last
-    assert_equal r.record_id, "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal r.meeting_id, event["payload"]["external_meeting_id"]
-    assert_equal r.state, "published"
-    assert_equal r.starttime, Time.at(event["payload"]["start_time"]/1000)
-    assert_equal r.endtime, Time.at(event["payload"]["end_time"]/1000)
-    assert_equal r.name, event["payload"]["metadata"]["meetingName"]
-    assert_nil r.participants
-    assert r.published
+    target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_equal target.meeting_id, event["payload"]["external_meeting_id"]
+    assert_equal target.state, "published"
+    assert_equal target.starttime, Time.at(event["payload"]["start_time"]/1000)
+    assert_equal target.endtime, Time.at(event["payload"]["end_time"]/1000)
+    assert_equal target.name, event["payload"]["metadata"]["meetingName"]
+    assert_nil target.participants
+    assert target.published
 
-    assert_equal r.metadata[0].recording, r
-    assert_equal r.metadata[0].key, "meetingName"
-    assert_equal r.metadata[0].value, "Certainly not Fred's Room"
-    assert_equal r.metadata[1].recording, r
-    assert_equal r.metadata[1].key, "isBreakout"
-    assert_equal r.metadata[1].value, "false"
-    assert_equal r.metadata[2].recording, r
-    assert_equal r.metadata[2].key, "meetingId"
-    assert_equal r.metadata[2].value, "Not Fred's Room"
+    assert_equal target.metadata[0].key, "meetingName"
+    assert_equal target.metadata[0].value, "Certainly not Fred's Room"
+    assert_equal target.metadata[1].key, "isBreakout"
+    assert_equal target.metadata[1].value, "false"
+    assert_equal target.metadata[2].key, "meetingId"
+    assert_equal target.metadata[2].value, "Not Fred's Room"
 
-    assert_equal r.playback_formats[0].recording, r
-    assert_equal r.playback_formats[0].format, "presentation"
-    assert_equal r.playback_formats[0].url, "/playback/presentation/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal r.playback_formats[0].length, 29185
-    assert_equal r.playback_formats[0].processing_time, 5999
+    assert_equal target.playback_formats[0].format, "presentation"
+    assert_equal target.playback_formats[0].url, "/playback/presentation/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
+    assert_equal target.playback_formats[0].length, 29185
+    assert_equal target.playback_formats[0].processing_time, 5999
 
-    assert_equal r.playback_formats[0].thumbnails[0].url, "/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png"
+    assert_equal target.playback_formats[0].thumbnails[0].url, "/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png"
   end
 
   # test '.sync_from_redis updates an existent recording and all associated models on publish_ended'
