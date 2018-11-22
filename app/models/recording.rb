@@ -65,21 +65,20 @@ class Recording < ApplicationRecord
         )
 
         if playback.has_key?("extensions")
-          images = playback["extensions"]["preview"]["images"]
+          images = playback["extensions"]["preview"]["images"]["image"]
           images = [images] unless images.is_a?(Array)
 
           images.each_with_index do |image, i|
             # newer versions of bbb have a different format
-            # old: {"images"=>{"image"=>"https://....png"}}
-            # new: {"images"=>{"image"=>{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}}}
-            if image["image"].is_a?(Hash)
-              image = image["image"]
-              image["image"] = image["link"]
+            # old: {"images"=>{"image"=>["https://....png"]}}
+            # new: {"images"=>{"image"=>[{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}]}}
+            if image.is_a?(String)
+              image = { "link" => image }
             end
 
             thumb = Thumbnail.find_or_create_by(
               playback_format: format,
-              url: URI(image["image"]).request_uri
+              url: URI(image["link"]).request_uri
             )
             thumb.update_attributes(
               width: image["width"],
