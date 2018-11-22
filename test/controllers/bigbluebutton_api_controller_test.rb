@@ -16,7 +16,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_select 'response>messageKey', 'checksumError'
   end
 
-  test 'with only checksum returns all recordings' do
+  test 'getRecordings with only checksum returns all recordings' do
     params = encode_bbb_params('getRecordings', '')
     get bigbluebutton_api_get_recordings_url, params: params
     assert_response :success
@@ -24,10 +24,11 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_select 'response>recordings>recording', Recording.count
   end
 
-  test 'fetches recording by meeting id' do
+  test 'getRecordings fetches recording by meeting id' do
     r = recordings(:fred_room)
     params = encode_bbb_params('getRecordings', { meetingID: r.meeting_id }.to_query)
     get bigbluebutton_api_get_recordings_url, params: params
+    url_prefix = "#{@request.protocol}#{@request.host}"
     assert_response :success
     assert_select 'response>returncode', 'SUCCESS'
     assert_select 'response>recordings>recording', 1
@@ -40,8 +41,20 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
       assert_select 'startTime', (r.starttime.to_r * 1000).to_i.to_s
       assert_select 'endTime', (r.endtime.to_r * 1000).to_i.to_s
       assert_select 'participants', r.participants.to_s
+      assert_select 'playback>format', r.playback_formats.count
+      assert_select 'playback>format' do |e|
+        format = css_select 'type'
+        case format.first.content
+        when 'podcast' then pf = playback_formats(:fred_room_podcast)
+        when 'presentation' then pf = playback_formats(:fred_room_presentation)
+        else flunk("Unexpected playback format: #{format.first.content}")
+        end
+
+        assert_select 'url', "#{url_prefix}#{pf.url}"
+        assert_select 'length', pf.length.to_s
+        assert_select 'processingTime', pf.processing_time.to_s
+      end
     end
-    assert_select 'playback>format', r.playback_formats.count
   end
 
   test 'does case-sensitive match on recording id' do
