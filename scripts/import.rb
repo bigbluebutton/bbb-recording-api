@@ -17,6 +17,15 @@ module ActiveSupport
   end
 end
 
+# adapted from https://gist.github.com/chris/b4138603a8fe17e073c6bc073eb17785
+class Hash
+  def deep_transform_values!(&block)
+    self.transform_values! do |value|
+      value.is_a?(Hash) ? value.deep_transform_values!(&block) : yield(value)
+    end
+  end
+end
+
 Rails.logger.info "Starting"
 
 trap("INT") do
@@ -24,26 +33,38 @@ trap("INT") do
   exit
 end
 
-published_path = "/var/bigbluebutton/published"
 redis_channel = "bigbluebutton:from-rap"
+paths = [
+  "/var/bigbluebutton/published/**/metadata.xml",
+  "/var/bigbluebutton/unpublished/**/metadata.xml"
+]
 
 redis = Redis.new(host: ENV["BBB_REDIS_HOST"], port: ENV["BBB_REDIS_PORT"], db: ENV["BBB_REDIS_DB"])
 
-Dir.glob(File.join(published_path, '**', 'metadata.xml')).each do|path|
-  matched = path.match(/([^\/]+)\/([^\/]+)\/metadata.xml$/)
-  format = matched[1]
-  record_id = matched[2]
+Dir[*paths].each do|metadata_path|
+  matched = metadata_path.match(/([^\/]+)\/([^\/]+)\/([^\/]+)\/metadata.xml$/)
+  scope = matched[1]
+  format = matched[2]
+  record_id = matched[3]
 
-  xml = File.open(path)
-  metadataxml = Hash.from_xml(xml)
-  metadataxml = metadataxml["recording"]
-  metadataxml["playback"].deep_transform_keys!{ |key|
+  xml = File.open(metadata_path)
+  metadata_xml = Hash.from_xml(xml)
+  metadata_xml = metadata_xml["recording"]
+  metadata_xml["playback"].deep_transform_keys!{ |key|
     if key == "__content__"
       "link"
     else
       key
     end
   }
+  metadata_xml.deep_transform_values!{ |v| v.is_a?(String) ? v.strip : v }
+
+  if scope == "unpublished"
+    origin = File.dirname(metadata_path)
+    destination = File.dirname(metadata_path).gsub(/unpublished/, 'published')
+    Rails.logger.info "Moving #{origin} to #{destination}"
+    FileUtils.mv(origin, destination)
+  end
 
   event = {
     header: {
@@ -53,21 +74,22 @@ Dir.glob(File.join(published_path, '**', 'metadata.xml')).each do|path|
       version: "0.0.1"
     }, payload: {
       success: true,
-      step_time: 0, ##??
-      playback: metadataxml["playback"],
-      metadata: metadataxml["meta"],
-      start_time: metadataxml["start_time"].to_i,
-      end_time: metadataxml["end_time"].to_i,
-      participants: metadataxml["participants"].to_i,
-      raw_size: metadataxml["raw_size"],
+      step_time: 0, # ?
+      playback: metadata_xml["playback"],
+      metadata: metadata_xml["meta"],
+      start_time: metadata_xml["start_time"].to_i,
+      end_time: metadata_xml["end_time"].to_i,
+      participants: metadata_xml["participants"].to_i,
+      raw_size: metadata_xml["raw_size"],
       workflow: format,
-      external_meeting_id: metadataxml["meta"]["meetingId"],
+      external_meeting_id: metadata_xml["meta"]["meetingId"],
+      published: metadata_xml["published"] == "true",
       record_id: record_id,
       meeting_id: record_id
-      # published: metadataxml["published"],
     }
   }
 
+  Rails.logger.info "Importing #{scope}/#{format}/#{record_id}"
   redis.publish redis_channel, event.to_json
 end
 
