@@ -37,6 +37,11 @@ class Recording < ApplicationRecord
       # attrs[:raw_size] = payload["raw_size"]
     end
 
+    # override :published in case it's present in the event
+    if payload.has_key?("published")
+      attrs[:published] = payload["published"]
+    end
+
     if payload.has_key?("metadata")
       metadata = payload["metadata"]
       attrs[:name] = metadata["meetingName"]
