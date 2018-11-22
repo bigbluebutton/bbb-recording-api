@@ -31,6 +31,18 @@ xml.response do
               xml.url "#{@url_prefix}#{format.url}"
               xml.length format.length
               xml.processingTime format.processing_time unless format.processing_time.nil?
+              if format.thumbnails.length > 0
+                xml.preview do
+                  xml.images do
+                    format.thumbnails.each do |thumbnail|
+                      xml.image "#{@url_prefix}#{thumbnail.url}",
+                                alt: thumbnail.alt,
+                                width: thumbnail.width,
+                                height: thumbnail.height
+                    end
+                  end
+                end
+              end
             end
           end
         end

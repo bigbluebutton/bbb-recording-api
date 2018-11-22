@@ -32,27 +32,42 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'response>returncode', 'SUCCESS'
     assert_select 'response>recordings>recording', 1
-    assert_select 'response>recordings>recording' do
-      assert_select 'recordID', r.record_id
-      assert_select 'meetingID', r.meeting_id
-      assert_select 'name', r.name
-      assert_select 'published', r.published
-      assert_select 'state', r.state
-      assert_select 'startTime', (r.starttime.to_r * 1000).to_i.to_s
-      assert_select 'endTime', (r.endtime.to_r * 1000).to_i.to_s
-      assert_select 'participants', r.participants.to_s
-      assert_select 'playback>format', r.playback_formats.count
-      assert_select 'playback>format' do |e|
-        format = css_select 'type'
-        case format.first.content
-        when 'podcast' then pf = playback_formats(:fred_room_podcast)
-        when 'presentation' then pf = playback_formats(:fred_room_presentation)
-        else flunk("Unexpected playback format: #{format.first.content}")
-        end
+    assert_select 'response>recordings>recording' do |rec_el|
+      assert_select rec_el, 'recordID', r.record_id
+      assert_select rec_el, 'meetingID', r.meeting_id
+      assert_select rec_el, 'name', r.name
+      assert_select rec_el, 'published', r.published
+      assert_select rec_el, 'state', r.state
+      assert_select rec_el, 'startTime', (r.starttime.to_r * 1000).to_i.to_s
+      assert_select rec_el, 'endTime', (r.endtime.to_r * 1000).to_i.to_s
+      assert_select rec_el, 'participants', r.participants.to_s
+      assert_select rec_el, 'playback>format', r.playback_formats.count
+      assert_select rec_el, 'playback>format' do |format_els|
+        format_els.each do |format_el|
+          format_type = css_select format_el, 'type'
+          pf = nil
+          case format_type.first.content
+          when 'podcast' then pf = playback_formats(:fred_room_podcast)
+          when 'presentation' then pf = playback_formats(:fred_room_presentation)
+          else flunk("Unexpected playback format: #{format_type.first.content}")
+          end
 
-        assert_select 'url', "#{url_prefix}#{pf.url}"
-        assert_select 'length', pf.length.to_s
-        assert_select 'processingTime', pf.processing_time.to_s
+          assert_select format_el, 'type', pf.format
+          assert_select format_el, 'url', "#{url_prefix}#{pf.url}"
+          assert_select format_el, 'length', pf.length.to_s
+          assert_select format_el, 'processingTime', pf.processing_time.to_s
+
+          imgs = css_select format_el, 'preview>images>image'
+          assert_equal imgs.length, pf.thumbnails.count
+          imgs.each_with_index do |img, i|
+            t = thumbnails("fred_room_#{pf.format}_thumb#{i+1}")
+            img = imgs[i]
+            assert_equal img['alt'], t.alt
+            assert_equal img['height'], t.height.to_s
+            assert_equal img['width'], t.width.to_s
+            assert_equal img.content, "#{url_prefix}#{t.url}"
+          end
+        end
       end
     end
   end

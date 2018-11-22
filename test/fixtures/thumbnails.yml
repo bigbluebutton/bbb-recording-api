@@ -1,0 +1,23 @@
+fred_room_presentation_thumb1:
+  playback_format: :fred_room_presentation
+  alt: 'Welcome to'
+  height: 136
+  width: 176
+  url: /presentation/ffbfc4cc24428694e8b53a4e144f414052431693-1530718721124/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1530718721134/thumbnails/thumb-1.png
+  sequence: 0
+
+fred_room_presentation_thumb2:
+  playback_format: :fred_room_presentation
+  alt: '(this slide left blank for use as a whiteboard)'
+  height: 136
+  width: 176
+  url: /presentation/ffbfc4cc24428694e8b53a4e144f414052431693-1530718721124/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1530718721134/thumbnails/thumb-2.png
+  sequence: 1
+
+fred_room_presentation_thumb3:
+  playback_format: :fred_room_presentation
+  alt: '(this slide left blank for use as a whiteboard)'
+  height: 136
+  width: 176
+  url: /presentation/ffbfc4cc24428694e8b53a4e144f414052431693-1530718721124/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1530718721134/thumbnails/thumb-3.png
+  sequence: 2

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_22_120626) do
+ActiveRecord::Schema.define(version: 2018_11_22_130007) do
 
   create_table "metadata", force: :cascade do |t|
     t.integer "recording_id"
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 2018_11_22_120626) do
     t.integer "height"
     t.string "alt"
     t.string "url"
+    t.integer "sequence"
     t.index ["playback_format_id"], name: "index_thumbnails_on_playback_format_id"
   end
 
