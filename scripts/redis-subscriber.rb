@@ -7,6 +7,11 @@ require rails_environment_path
 
 Rails.logger.info "Starting"
 
+trap("INT") do
+  puts "Script terminated by user"
+  exit
+end
+
 target_events = [
   "archive_started",
   "archive_ended",

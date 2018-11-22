@@ -19,6 +19,11 @@ end
 
 Rails.logger.info "Starting"
 
+trap("INT") do
+  puts "Script terminated by user"
+  exit
+end
+
 published_path = "/var/bigbluebutton/published"
 redis_channel = "bigbluebutton:from-rap"
 
