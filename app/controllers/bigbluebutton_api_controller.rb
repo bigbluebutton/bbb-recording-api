@@ -12,11 +12,12 @@ class BigbluebuttonApiController < ApplicationController
   rescue_from ApiError, with: :api_error
 
   def getRecordings
-    query = Recording.includes(:playback_formats, :metadata)
+    query = Recording.includes(playback_formats: [ :thumbnails ], metadata: [])
     query = query.with_recording_id_prefixes(params[:recordID].split(',')) if params[:recordID].present?
     query = query.where(meeting_id: params[:meetingID].split(',')) if params[:meetingID].present?
 
     @recordings = query.all
+    @url_prefix = "#{request.protocol}#{request.host}"
     render :get_recordings
   end
 

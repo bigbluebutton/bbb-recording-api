@@ -28,7 +28,7 @@ xml.response do
           recording.playback_formats.each do |format|
             xml.format do
               xml.type format.format
-              xml.url format.url
+              xml.url "#{@url_prefix}#{format.url}"
               xml.length format.length
             end
           end
