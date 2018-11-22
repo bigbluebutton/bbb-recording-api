@@ -1,0 +1,4 @@
+config/master.key
+log/*
+tmp/*
+db/*.sqlite3
