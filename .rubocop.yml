@@ -25,7 +25,11 @@ Rails:
   Enabled: true
 Rails/CreateTableWithTimestamps:
   Enabled: false
+Rails/SkipsModelValidations:
+  Enabled: false
 Style/Documentation:
   Enabled: false
 Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/NumericLiterals:
   Enabled: false
