@@ -41,6 +41,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
       assert_select rec_el, 'startTime', (r.starttime.to_r * 1000).to_i.to_s
       assert_select rec_el, 'endTime', (r.endtime.to_r * 1000).to_i.to_s
       assert_select rec_el, 'participants', r.participants.to_s
+
       assert_select rec_el, 'playback>format', r.playback_formats.count
       assert_select rec_el, 'playback>format' do |format_els|
         format_els.each do |format_el|
@@ -72,7 +73,21 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'does case-sensitive match on recording id' do
+  test 'getRecordings allows multiple comma-separated meeting IDs' do
+    r1 = recordings(:fred_room)
+    r2 = recordings(:published_false)
+
+    params = encode_bbb_params('getRecordings', {
+      meetingID: [r1.meeting_id, r2.meeting_id].join(',')
+    }.to_query)
+    get bigbluebutton_api_get_recordings_url, params: params
+
+    assert_response :success
+    assert_select 'response>returncode', 'SUCCESS'
+    assert_select 'response>recordings>recording', 2
+  end
+
+  test 'getRecordings does case-sensitive match on recording id' do
     r = recordings(:fred_room)
     params = encode_bbb_params('getRecordings', { recordID: r.record_id.upcase }.to_query)
     get bigbluebutton_api_get_recordings_url, params: params
@@ -82,15 +97,28 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_select 'response>recordings>recording', 0
   end
 
-  test 'does prefix match on recording id' do
-    r = recordings(:fred_room)
+  test 'getRecordings does prefix match on recording id' do
+    r = recordings(:bulk_room1)
     params = encode_bbb_params('getRecordings', { recordID: r.record_id[0, 40] }.to_query)
     get bigbluebutton_api_get_recordings_url, params: params
     assert_response :success
     assert_select 'response>returncode', 'SUCCESS'
-    assert_select 'response>recordings>recording', 1
-    assert_select 'recording>recordID', r.record_id
+    assert_select 'response>recordings>recording', 20
     assert_select 'recording>meetingID', r.meeting_id
+  end
+
+  test 'getRecordings allows multiple comma-separated recording IDs' do
+    r1 = recordings(:fred_room)
+    r2 = recordings(:published_false)
+
+    params = encode_bbb_params('getRecordings', {
+      recordID: [r1.record_id, r2.record_id].join(',')
+    }.to_query)
+    get bigbluebutton_api_get_recordings_url, params: params
+
+    assert_response :success
+    assert_select 'response>returncode', 'SUCCESS'
+    assert_select 'response>recordings>recording', 2
   end
 
   # publishRecordings
