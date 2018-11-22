@@ -24,7 +24,12 @@ target_events = [
 ]
 redis_channel = "bigbluebutton:from-rap"
 
-redis = Redis.new(host: ENV["BBB_REDIS_HOST"], port: ENV["BBB_REDIS_PORT"], db: ENV["BBB_REDIS_DB"])
+redis = Redis.new(
+  host: ENV["BBB_REDIS_HOST"],
+  port: ENV["BBB_REDIS_PORT"],
+  db: ENV["BBB_REDIS_DB"],
+  tcp_keepalive: 20
+)
 
 redis.subscribe(redis_channel) do |on|
   on.subscribe do |channel, subscriptions|
