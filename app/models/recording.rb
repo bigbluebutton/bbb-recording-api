@@ -1,5 +1,3 @@
-require 'bigbluebutton'
-
 class Recording < ApplicationRecord
   has_many :metadata, dependent: :destroy
   has_many :playback_formats, dependent: :destroy
@@ -56,7 +54,7 @@ class Recording < ApplicationRecord
       playbacks.each do |playback|
         format = PlaybackFormat.find_or_create_by(recording: recording, format: playback["format"])
         format.update_attributes(
-          url: ::BigBlueButton.remove_domain(playback["link"]),
+          url: URI(playback["link"]).request_uri,
           length: playback["duration"],
           processing_time: playback["processing_time"]
         )
@@ -76,7 +74,7 @@ class Recording < ApplicationRecord
 
             thumb = Thumbnail.find_or_create_by(
               playback_format: format,
-              url: ::BigBlueButton.remove_domain(image["image"])
+              url: URI(image["image"]).request_uri
             )
             thumb.update_attributes(
               width: image["width"],
