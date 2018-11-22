@@ -123,4 +123,34 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_select 'response>returncode', 'FAILURE'
     assert_select 'response>messageKey', 'missingParamPublish'
   end
+
+  test 'publishRecordings updates published property to false' do
+    r = recordings(:fred_room)
+    assert_equal r.published, true
+
+    params = encode_bbb_params('publishRecordings', { recordID: r.record_id, publish: 'false' }.to_query)
+    get bigbluebutton_api_publish_recordings_url, params: params
+
+    assert_response :success
+    assert_select 'response>returncode', 'SUCCESS'
+    assert_select 'response>published', 'false'
+
+    r.reload
+    assert_equal r.published, false
+  end
+
+  test 'publishRecordings updates published property to true' do
+    r = recordings(:published_false)
+    assert_equal r.published, false
+
+    params = encode_bbb_params('publishRecordings', { recordID: r.record_id, publish: 'true' }.to_query)
+    get bigbluebutton_api_publish_recordings_url, params: params
+
+    assert_response :success
+    assert_select 'response>returncode', 'SUCCESS'
+    assert_select 'response>published', 'true'
+
+    r.reload
+    assert_equal r.published, true
+  end
 end

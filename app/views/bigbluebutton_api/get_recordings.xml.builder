@@ -6,7 +6,7 @@ xml.response do
         xml.recordID recording.record_id
         xml.meetingID recording.meeting_id
         xml.name recording.name
-        xml.published recording.published
+        xml.published recording.published ? 'true' : 'false'
         xml.state recording.state unless recording.state.nil?
         xml.startTime((recording.starttime.to_r * 1000).to_i)
         xml.endTime((recording.endtime.to_r * 1000).to_i)
