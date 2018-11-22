@@ -63,7 +63,7 @@ class Recording < ApplicationRecord
           images = playback["extensions"]["preview"]["images"]
           images = [images] unless images.is_a?(Array)
 
-          images.each do |image|
+          images.each_with_index do |image, i|
             # newer versions of bbb have a different format
             # old: {"images"=>{"image"=>"https://....png"}}
             # new: {"images"=>{"image"=>{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}}}
@@ -79,7 +79,8 @@ class Recording < ApplicationRecord
             thumb.update_attributes(
               width: image["width"],
               height: image["height"],
-              alt: image["alt"]
+              alt: image["alt"],
+              sequence: i
             )
           end
         end
