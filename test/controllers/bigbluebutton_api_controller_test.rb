@@ -26,7 +26,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
 
   test 'fetches recording by meeting id' do
     r = recordings(:fred_room)
-    params = encode_bbb_params('getRecordings', {meetingID: r.meeting_id}.to_query)
+    params = encode_bbb_params('getRecordings', { meetingID: r.meeting_id }.to_query)
     get bigbluebutton_api_get_recordings_url, params: params
     assert_response :success
     assert_select 'response>returncode', 'SUCCESS'
@@ -46,7 +46,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
 
   test 'does case-sensitive match on recording id' do
     r = recordings(:fred_room)
-    params = encode_bbb_params('getRecordings', {recordID: r.record_id.upcase}.to_query)
+    params = encode_bbb_params('getRecordings', { recordID: r.record_id.upcase }.to_query)
     get bigbluebutton_api_get_recordings_url, params: params
     assert_response :success
     assert_select 'response>returncode', 'SUCCESS'
@@ -56,7 +56,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
 
   test 'does prefix match on recording id' do
     r = recordings(:fred_room)
-    params = encode_bbb_params('getRecordings', {recordID: r.record_id[0, 40]}.to_query)
+    params = encode_bbb_params('getRecordings', { recordID: r.record_id[0, 40] }.to_query)
     get bigbluebutton_api_get_recordings_url, params: params
     assert_response :success
     assert_select 'response>returncode', 'SUCCESS'

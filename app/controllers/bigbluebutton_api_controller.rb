@@ -27,7 +27,7 @@ class BigbluebuttonApiController < ApplicationController
     publish = params[:publish].casecmp('true').zero?
 
     query = Recording.where(record_id: params[:recordID].split(','), state: 'published')
-    raise APIError.new('notFound', 'We could not find recordings') if query.count.zero?
+    raise APIError.new('notFound', 'We could not find recordings') if query.none?
 
     query.where.not(published: publish).update_all(published: publish)
 
