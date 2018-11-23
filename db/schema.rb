@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_22_130007) do
+ActiveRecord::Schema.define(version: 2018_11_22_202149) do
 
   create_table "metadata", force: :cascade do |t|
     t.integer "recording_id"
     t.string "key"
     t.string "value"
-    t.index ["recording_id"], name: "index_metadata_on_recording_id"
+    t.index ["recording_id", "key"], name: "index_metadata_on_recording_id_and_key", unique: true
   end
 
   create_table "playback_formats", force: :cascade do |t|
