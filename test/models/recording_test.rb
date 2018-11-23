@@ -18,6 +18,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_not_nil target
     assert_nil target.meeting_id
     assert_equal target.state, "processing"
     assert_nil target.starttime
@@ -45,6 +46,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: r.record_id)
+    assert_not_nil target
     assert_equal target.meeting_id, r.meeting_id
     assert_equal target.state, "processing"
     assert_equal target.starttime, r.starttime
@@ -74,6 +76,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processing"
     assert_nil target.starttime
@@ -104,6 +107,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: r.record_id)
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processing"
     assert_equal target.starttime, r.starttime
@@ -131,6 +135,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processing"
     assert_nil target.starttime
@@ -159,6 +164,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: r.record_id)
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processing"
     assert_equal target.starttime, r.starttime
@@ -188,6 +194,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processing"
     assert_nil target.starttime
@@ -218,6 +225,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: r.record_id)
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processing"
     assert_equal target.starttime, r.starttime
@@ -246,6 +254,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processing"
     assert_nil target.starttime
@@ -275,6 +284,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: r.record_id)
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processing"
     assert_equal target.starttime, r.starttime
@@ -305,6 +315,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processed"
     assert_nil target.starttime
@@ -336,6 +347,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: r.record_id)
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processed"
     assert_equal target.starttime, r.starttime
@@ -364,6 +376,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processed"
     assert_nil target.starttime
@@ -395,6 +408,7 @@ class RecordingTest < ActiveSupport::TestCase
       Recording.sync_from_redis(event)
     end
     target = Recording.find_by(record_id: r.record_id)
+    assert_not_nil target
     assert_equal target.meeting_id, "Not Fred's Room"
     assert_equal target.state, "processed"
     assert_equal target.starttime, r.starttime
@@ -471,6 +485,7 @@ class RecordingTest < ActiveSupport::TestCase
     end
 
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
+    assert_not_nil target
     assert_equal target.meeting_id, event["payload"]["external_meeting_id"]
     assert_equal target.state, "published"
     assert_equal target.starttime, Time.at(event["payload"]["start_time"]/1000)
@@ -479,25 +494,32 @@ class RecordingTest < ActiveSupport::TestCase
     assert_nil target.participants
     assert target.published
 
-    assert_equal target.metadata[0].key, "meetingName"
-    assert_equal target.metadata[0].value, "Certainly not Fred's Room"
-    assert_equal target.metadata[1].key, "isBreakout"
-    assert_equal target.metadata[1].value, "false"
-    assert_equal target.metadata[2].key, "meetingId"
-    assert_equal target.metadata[2].value, "Not Fred's Room"
+    meta = target.metadata.find_by(key: "meetingName")
+    assert_not_nil meta
+    assert_equal meta.value, "Certainly not Fred's Room"
+    meta = target.metadata.find_by(key: "isBreakout")
+    assert_not_nil meta
+    assert_equal meta.value, "false"
+    meta = target.metadata.find_by(key: "meetingId")
+    assert_not_nil meta
+    assert_equal meta.value, "Not Fred's Room"
 
-    assert_equal target.playback_formats[0].format, "presentation"
-    assert_equal target.playback_formats[0].url, "/playback/presentation/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal target.playback_formats[0].length, 29185
-    assert_equal target.playback_formats[0].processing_time, 5999
-    assert_equal target.playback_formats[0].thumbnails[0].url, "/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png"
-    assert_equal target.playback_formats[0].thumbnails[1].url, "/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-2.png"
+    pf = target.playback_formats.find_by(format: "presentation")
+    assert_not_nil pf
+    assert_equal pf.url, "/playback/presentation/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
+    assert_equal pf.length, 29185
+    assert_equal pf.processing_time, 5999
+    assert_equal pf.thumbnails.count, 2
+    assert_not_nil pf.thumbnails.find_by(url: "/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png")
+    assert_not_nil pf.thumbnails.find_by(url: "/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-2.png")
 
-    assert_equal target.playback_formats[1].format, "podcast"
-    assert_equal target.playback_formats[1].url, "/playback/podcast/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
-    assert_equal target.playback_formats[1].length, 22999
-    assert_equal target.playback_formats[1].processing_time, 9919
-    assert_equal target.playback_formats[1].thumbnails[0].url, "/podcast/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/podcast/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png"
+    pf = target.playback_formats.find_by(format: "podcast")
+    assert_not_nil pf
+    assert_equal pf.url, "/playback/podcast/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
+    assert_equal pf.length, 22999
+    assert_equal pf.processing_time, 9919
+    assert_equal pf.thumbnails.count, 1
+    assert_not_nil pf.thumbnails.find_by(url: "/podcast/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/podcast/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png")
   end
 
   # test '.sync_from_redis updates an existent recording and all associated models on publish_ended'

@@ -15,7 +15,7 @@ xml.response do
         xml.metadata do
           recording.metadata.each do |metadatum|
             if metadatum.value.blank?
-              xml.tag! k do
+              xml.tag! metadatum.key do
                 # For legacy reasons - some integrations require *a* node of
                 # some sort inside empty meta tags
                 xml.cdata! ''
