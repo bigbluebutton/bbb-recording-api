@@ -263,4 +263,29 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
       m = metadata(:fred_room_meta_gl_listed)
     end
   end
+
+  test 'updateRecordings updates metadata on multiple recordings' do
+    meta_params = { 'newkey' => 'newvalue', 'gl-listed' => '' }
+    params = encode_bbb_params('updateRecordings', {
+      recordID: recordings(:fred_room, :bulk_room1).pluck(:record_id).join(',')
+    }.merge(meta_params.transform_keys { |k| "meta_#{k}" }).to_query)
+
+    # Add 2 metadata, delete 1 existing
+    assert_difference(
+      'Metadatum.where(recording_id: recordings(:fred_room)).count' => 0,
+      'Metadatum.where(recording_id: recordings(:bulk_room1)).count' => 1,
+      'Metadatum.count' => 1
+    ) do
+      get bigbluebutton_api_update_recordings_url, params: params
+    end
+
+    assert_response :success
+    assert_select 'response>returncode', 'SUCCESS'
+    assert_select 'response>updated', 'true'
+
+    assert Metadatum.find_by(recording_id: recordings(:fred_room), key: 'gl-listed').nil?
+    assert Metadatum.find_by(recording_id: recordings(:bulk_room1), key: 'gl-listed').nil?
+    assert_equal Metadatum.find_by(recording_id: recordings(:fred_room), key: 'newkey').value, 'newvalue'
+    assert_equal Metadatum.find_by(recording_id: recordings(:bulk_room1), key: 'newkey').value, 'newvalue'
+  end
 end
