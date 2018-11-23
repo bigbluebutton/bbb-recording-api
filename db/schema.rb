@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_23_115905) do
+ActiveRecord::Schema.define(version: 2018_11_23_180008) do
 
   create_table "metadata", force: :cascade do |t|
     t.integer "recording_id"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 2018_11_23_115905) do
     t.string "state"
     t.datetime "starttime"
     t.datetime "endtime"
+    t.datetime "deleted_at"
     t.index ["meeting_id"], name: "index_recordings_on_meeting_id"
     t.index ["record_id"], name: "index_recordings_on_record_id", unique: true
   end
