@@ -486,11 +486,11 @@ class RecordingTest < ActiveSupport::TestCase
 
     target = Recording.find_by(record_id: "a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284")
     assert_not_nil target
-    assert_equal target.meeting_id, event["payload"]["external_meeting_id"]
-    assert_equal target.state, "published"
-    assert_equal target.starttime, Time.at(event["payload"]["start_time"]/1000)
-    assert_equal target.endtime, Time.at(event["payload"]["end_time"]/1000)
-    assert_equal target.name, event["payload"]["metadata"]["meetingName"]
+    assert_equal event['payload']['external_meeting_id'], target.meeting_id
+    assert_equal target.state, 'published'
+    assert_equal target.starttime, Time.at(Rational(event['payload']['start_time'], 1000)).utc
+    assert_equal target.endtime, Time.at(Rational(event['payload']['end_time'], 1000)).utc
+    assert_equal event['payload']['metadata']['meetingName'], target.name
     assert_nil target.participants
     assert target.published
 
