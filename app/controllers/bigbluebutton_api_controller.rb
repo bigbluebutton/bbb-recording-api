@@ -12,7 +12,7 @@ class BigbluebuttonApiController < ApplicationController
   rescue_from ApiError, with: :api_error
 
   def getRecordings
-    query = Recording.includes(playback_formats: [ :thumbnails ], metadata: [])
+    query = Recording.includes(playback_formats: [:thumbnails], metadata: [])
     query = query.with_recording_id_prefixes(params[:recordID].split(',')) if params[:recordID].present?
     query = query.where(meeting_id: params[:meetingID].split(',')) if params[:meetingID].present?
 
@@ -38,12 +38,14 @@ class BigbluebuttonApiController < ApplicationController
 
   def updateRecordings
     raise ApiError.new('missingParamRecordID', 'You must specify a recordID.') if params[:recordID].blank?
+
     record_ids = params[:recordID].split(',')
 
     add_metadata = {}
     remove_metadata = []
     params.each do |key, value|
       next unless key.start_with?('meta_')
+
       key = key[5..-1]
 
       if value.blank?

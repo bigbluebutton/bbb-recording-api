@@ -222,8 +222,8 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
 
     meta_params.each do |k, v|
       m = Metadatum.find_by(recording: recordings(:fred_room), key: k)
-      assert_not(m.nil?)
-      assert(m.value, v)
+      assert_not m.nil?
+      assert m.value, v
     end
   end
 
@@ -243,5 +243,24 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
 
     m = metadata(:fred_room_meta_gl_listed)
     assert_equal m.value, meta_params['gl-listed']
+  end
+
+  test 'updateRecordings deletes an existing meta parameter' do
+    meta_params = { 'gl-listed' => '' }
+    params = encode_bbb_params('updateRecordings', {
+      recordID: recordings(:fred_room).record_id
+    }.merge(meta_params.transform_keys { |k| "meta_#{k}" }).to_query)
+
+    assert_difference 'Metadatum.count', -1 do
+      get bigbluebutton_api_update_recordings_url, params: params
+    end
+
+    assert_response :success
+    assert_select 'response>returncode', 'SUCCESS'
+    assert_select 'response>updated', 'true'
+
+    assert_raises ActiveRecord::RecordNotFound do
+      m = metadata(:fred_room_meta_gl_listed)
+    end
   end
 end
