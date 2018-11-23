@@ -2,6 +2,8 @@ class Recording < ApplicationRecord
   has_many :metadata, dependent: :destroy
   has_many :playback_formats, dependent: :destroy
 
+  validates :state, inclusion: { in: %w[processing processed publishing published deleted] }, allow_nil: true
+
   scope :with_recording_id_prefixes, lambda { |recording_ids|
     return none if recording_ids.empty?
 
