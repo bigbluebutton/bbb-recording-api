@@ -35,6 +35,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_select 'response>recordings>recording' do |rec_el|
       assert_select rec_el, 'recordID', r.record_id
       assert_select rec_el, 'meetingID', r.meeting_id
+      assert_select rec_el, 'internalMeetingID', r.record_id
       assert_select rec_el, 'name', r.name
       assert_select rec_el, 'published', r.published
       assert_select rec_el, 'state', r.state
