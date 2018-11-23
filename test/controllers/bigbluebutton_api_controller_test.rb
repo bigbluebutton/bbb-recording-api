@@ -182,4 +182,66 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     r.reload
     assert_equal r.published, true
   end
+
+  # updateRecordings
+  test 'updateRecordings with no parameters returns checksum error' do
+    get bigbluebutton_api_update_recordings_url
+    assert_response :success
+    assert_select 'response>returncode', 'FAILURE'
+    assert_select 'response>messageKey', 'checksumError'
+  end
+
+  test 'updateRecordings with invalid checksum returns checksum error' do
+    get bigbluebutton_api_update_recordings_url, params: "checksum=#{'x' * 40}"
+    assert_response :success
+    assert_select 'response>returncode', 'FAILURE'
+    assert_select 'response>messageKey', 'checksumError'
+  end
+
+  test 'updateRecordings requires recordID parameter' do
+    params = encode_bbb_params('updateRecordings', '')
+    get bigbluebutton_api_update_recordings_url, params: params
+    assert_response :success
+    assert_select 'response>returncode', 'FAILURE'
+    assert_select 'response>messageKey', 'missingParamRecordID'
+  end
+
+  test 'updateRecordings adds a new meta parameter' do
+    meta_params = { 'newparam' => 'newvalue' }
+    params = encode_bbb_params('updateRecordings', {
+      recordID: recordings(:fred_room).record_id
+    }.merge(meta_params.transform_keys { |k| "meta_#{k}" }).to_query)
+
+    assert_difference 'Metadatum.count', 1 do
+      get bigbluebutton_api_update_recordings_url, params: params
+    end
+
+    assert_response :success
+    assert_select 'response>returncode', 'SUCCESS'
+    assert_select 'response>updated', 'true'
+
+    meta_params.each do |k, v|
+      m = Metadatum.find_by(recording: recordings(:fred_room), key: k)
+      assert_not(m.nil?)
+      assert(m.value, v)
+    end
+  end
+
+  test 'updateRecordings updates an existing meta parameter' do
+    meta_params = { 'gl-listed' => 'false' }
+    params = encode_bbb_params('updateRecordings', {
+      recordID: recordings(:fred_room).record_id
+    }.merge(meta_params.transform_keys { |k| "meta_#{k}" }).to_query)
+
+    assert_no_difference 'Metadatum.count' do
+      get bigbluebutton_api_update_recordings_url, params: params
+    end
+
+    assert_response :success
+    assert_select 'response>returncode', 'SUCCESS'
+    assert_select 'response>updated', 'true'
+
+    m = metadata(:fred_room_meta_gl_listed)
+    assert_equal m.value, meta_params['gl-listed']
+  end
 end

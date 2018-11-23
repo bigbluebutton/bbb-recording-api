@@ -1,14 +1,18 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 fred_room_meta_isBreakout:
+  recording: :fred_room
   key: isBreakout
   value: "false"
 fred_room_meta_meetingName:
+  recording: :fred_room
   key: meetingName
   value: "Fred's Room"
 fred_room_meta_gl_listed:
+  recording: :fred_room
   key: gl-listed
   value: "false"
 fred_room_meta_meetingId:
+  recording: :fred_room
   key: meetingId
   value: c637ba21adcd0191f48f5c4bf23fab0f96ed5c18

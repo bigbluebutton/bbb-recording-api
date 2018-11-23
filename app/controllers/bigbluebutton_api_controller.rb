@@ -36,6 +36,32 @@ class BigbluebuttonApiController < ApplicationController
     render :publish_recordings
   end
 
+  def updateRecordings
+    raise ApiError.new('missingParamRecordID', 'You must specify a recordID.') if params[:recordID].blank?
+    record_ids = params[:recordID].split(',')
+
+    add_metadata = {}
+    remove_metadata = []
+    params.each do |key, value|
+      next unless key.start_with?('meta_')
+      key = key[5..-1]
+
+      if value.blank?
+        remove_metadata << key
+      else
+        add_metadata[key] = value
+      end
+    end
+
+    Metadatum.transaction do
+      Metadatum.upsert_by_record_id(record_ids, add_metadata)
+      Metadatum.delete_by_record_id(record_ids, remove_metadata)
+    end
+
+    @updated = !(add_metadata.empty? && remove_metadata.empty?)
+    render :update_recordings
+  end
+
   private
 
   def api_error(exception)
