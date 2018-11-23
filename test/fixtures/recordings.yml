@@ -31,3 +31,12 @@ published_false:
   state: published
   starttime: 1542808333391
   endtime: 1542808562014
+
+out_of_order:
+  meeting_id: out_of_order
+  record_id: 471bd597949c849e4b8d62c40fb2156406c9bfef-1542973566267
+  name: "Recording with playback formats explicitly out of order"
+  published: true
+  state: published
+  starttime: 1542973566267
+  endtime: 1542973567267

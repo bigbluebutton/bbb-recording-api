@@ -23,3 +23,19 @@ bulk_room<%= num %>_presentation:
   length: 30
   processing_time: <%= 30 * 60 * 1000 + num %>
 <% end %>
+
+out_of_order_a:
+  id: 2
+  recording: :out_of_order
+  format: a
+  url: /a
+  length: 1
+  processing_time: 1000
+
+out_of_order_b:
+  id: 1
+  recording: :out_of_order
+  format: b
+  url: /b
+  length: 1
+  processing_time: 1000
