@@ -414,20 +414,38 @@ class RecordingTest < ActiveSupport::TestCase
       }, payload: {
         success: true,
         step_time: 1793,
-        playback: {
-          format: 'presentation',
-          link: 'https://dev90.bigbluebutton.org/playback/presentation/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284',
-          processing_time: 5999,
-          duration: 29185,
-          extensions: {
-            preview: {
-              images: {
-                image: 'https://dev90.bigbluebutton.org/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png'
+        playback: [
+          {
+            format: 'presentation',
+            link: 'https://dev90.bigbluebutton.org/playback/presentation/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284',
+            processing_time: 5999,
+            duration: 29185,
+            extensions: {
+              preview: {
+                images: {
+                  image: [
+                    'https://dev90.bigbluebutton.org/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png',
+                    'https://dev90.bigbluebutton.org/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-2.png'
+                  ]
+                }
               }
-            }
-          },
-          size: 321302
-        }, metadata: {
+            },
+            size: 321302
+          }, {
+            format: 'podcast',
+            link: 'https://dev90.bigbluebutton.org/playback/podcast/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284',
+            processing_time: 9919,
+            duration: 22999,
+            extensions: {
+              preview: {
+                images: {
+                  image: 'https://dev90.bigbluebutton.org/podcast/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/podcast/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png'
+                }
+              }
+            },
+            size: 28892
+          }
+        ], metadata: {
           meetingName: "Certainly not Fred's Room",
           isBreakout: "false",
           meetingId: "Not Fred's Room"
@@ -444,8 +462,8 @@ class RecordingTest < ActiveSupport::TestCase
 
     assert_difference "Recording.count" do
       assert_difference "Metadatum.count", 3 do
-        assert_difference "PlaybackFormat.count" do
-          assert_difference "Thumbnail.count" do
+        assert_difference "PlaybackFormat.count", 2 do
+          assert_difference "Thumbnail.count", 3 do
             Recording.sync_from_redis(event)
           end
         end
@@ -472,8 +490,14 @@ class RecordingTest < ActiveSupport::TestCase
     assert_equal target.playback_formats[0].url, "/playback/presentation/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
     assert_equal target.playback_formats[0].length, 29185
     assert_equal target.playback_formats[0].processing_time, 5999
-
     assert_equal target.playback_formats[0].thumbnails[0].url, "/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png"
+    assert_equal target.playback_formats[0].thumbnails[1].url, "/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-2.png"
+
+    assert_equal target.playback_formats[1].format, "podcast"
+    assert_equal target.playback_formats[1].url, "/playback/podcast/2.0/playback.html?meetingId=a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284"
+    assert_equal target.playback_formats[1].length, 22999
+    assert_equal target.playback_formats[1].processing_time, 9919
+    assert_equal target.playback_formats[1].thumbnails[0].url, "/podcast/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/podcast/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png"
   end
 
   # test '.sync_from_redis updates an existent recording and all associated models on publish_ended'
