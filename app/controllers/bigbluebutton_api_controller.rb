@@ -19,6 +19,14 @@ class BigbluebuttonApiController < ApplicationController
       query = query.where(meeting_id: params[:meetingID].split(','))
     end
 
+    # processing|processed|published|unpublished|deleted
+    if params[:state].present?
+      states = params[:state].split(',')
+    else
+      states = %w[published unpublished]
+    end
+    query = query.where(state: states) unless states.include?('any')
+
     @recordings = query.order(starttime: :desc).all
     @url_prefix = "#{request.protocol}#{request.host}"
     render :get_recordings
