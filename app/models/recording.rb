@@ -38,11 +38,9 @@ class Recording < ApplicationRecord
         recording.published = true
       end
 
-      # override :published in case it's present in the event
-      recording.published = payload['publish'] if payload.key?('published')
-
+      # override attributes if present in the event
+      recording.published = payload['published'] if payload.key?('published')
       recording.name = payload['metadata']['meetingName'] if payload.key?('metadata')
-
       recording.save!
 
       Metadatum.upsert_by_record_id(payload['record_id'], payload['metadata']) if payload.key?('metadata')
