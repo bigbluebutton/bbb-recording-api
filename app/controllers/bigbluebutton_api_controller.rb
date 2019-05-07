@@ -90,9 +90,9 @@ class BigbluebuttonApiController < ApplicationController
     query = Recording.where(record_id: params[:recordID].split(','))
     raise ApiError.new('notFound', 'We could not find recordings') if query.none?
 
-    destroyed_recordings = query.destroy_all
+    destroyed_count = query.update_all(state: 'deleted')
 
-    @deleted = !destroyed_recordings.empty?
+    @deleted = destroyed_count.positive?
     render :delete_recordings
   end
 
