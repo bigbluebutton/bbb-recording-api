@@ -12,4 +12,8 @@ Rails.application.routes.draw do
     to: 'bigbluebutton_api#updateRecordings',
     as: 'bigbluebutton_api_update_recordings',
     defaults: { format: 'xml' }
+  get 'bigbluebutton/api/deleteRecordings',
+      to: 'bigbluebutton_api#deleteRecordings',
+      as: 'bigbluebutton_api_delete_recordings',
+      defaults: { format: 'xml' }
 end
