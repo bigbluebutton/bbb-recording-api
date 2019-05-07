@@ -1,18 +1,18 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  get 'bigbluebutton/api/getRecordings',
+  base = ENV.fetch('BBB_API_BASEPATH')
+  get "#{base}/getRecordings",
     to: 'bigbluebutton_api#getRecordings',
     as: 'bigbluebutton_api_get_recordings',
     defaults: { format: 'xml' }
-  get 'bigbluebutton/api/publishRecordings',
+  get "#{base}/publishRecordings",
     to: 'bigbluebutton_api#publishRecordings',
     as: 'bigbluebutton_api_publish_recordings',
     defaults: { format: 'xml' }
-  get 'bigbluebutton/api/updateRecordings',
+  get "#{base}/updateRecordings",
     to: 'bigbluebutton_api#updateRecordings',
     as: 'bigbluebutton_api_update_recordings',
     defaults: { format: 'xml' }
-  get 'bigbluebutton/api/deleteRecordings',
+  get "#{base}/deleteRecordings",
       to: 'bigbluebutton_api#deleteRecordings',
       as: 'bigbluebutton_api_delete_recordings',
       defaults: { format: 'xml' }
