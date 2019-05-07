@@ -9,6 +9,7 @@ class BigbluebuttonApiController < ApplicationController
   end
 
   before_action :checksum
+  before_action :parse_metadata
   rescue_from ApiError, with: :api_error
 
   def getRecordings
@@ -26,6 +27,18 @@ class BigbluebuttonApiController < ApplicationController
       states = %w[published unpublished]
     end
     query = query.where(state: states) unless states.include?('any')
+
+    # filters by metadata
+    # if there's more than one meta, returns only recordings with *all* of them
+    unless @metadata.empty?
+      ids = nil
+      @metadata.each do |key, value|
+        meta_query = Metadatum
+        meta_query = meta_query.where(recording_id: ids) unless ids.nil?
+        ids = meta_query.where(metadata: { key: key, value: value }).pluck(:recording_id)
+      end
+      query = query.where(id: ids)
+    end
 
     @recordings = query.order(starttime: :desc).all
     @url_prefix = "#{request.protocol}#{request.host}"
@@ -54,11 +67,7 @@ class BigbluebuttonApiController < ApplicationController
 
     add_metadata = {}
     remove_metadata = []
-    params.each do |key, value|
-      next unless key.start_with?('meta_')
-
-      key = key[5..-1]
-
+    @metadata.each do |key, value|
       if value.blank?
         remove_metadata << key
       else
@@ -103,5 +112,14 @@ class BigbluebuttonApiController < ApplicationController
     return if our_checksum == params[:checksum]
 
     raise ApiError.new('checksumError', 'You did not pass the checksum security check')
+  end
+
+  def parse_metadata
+    @metadata = {}
+    params.each do |key, value|
+      next unless key.start_with?('meta_')
+      key = key[5..-1]
+      @metadata[key] = value
+    end
   end
 end
