@@ -88,9 +88,10 @@ class BigbluebuttonApiController < ApplicationController
     raise ApiError.new('missingParamRecordID', 'You must specify a recordID.') if params[:recordID].blank?
 
     query = Recording.where(record_id: params[:recordID].split(','))
+                     .where.not(state: 'deleted')
     raise ApiError.new('notFound', 'We could not find recordings') if query.none?
 
-    destroyed_count = query.update_all(state: 'deleted')
+    destroyed_count = query.update_all(state: 'deleted', deleted_at: Time.now)
 
     @deleted = destroyed_count.positive?
     render :delete_recordings
