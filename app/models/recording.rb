@@ -16,7 +16,6 @@ class Recording < ApplicationRecord
   def self.sync_from_redis(message)
     header = message["header"]
     payload = message["payload"]
-    attrs = {}
 
     record_id = payload['record_id']
     Recording.transaction do
@@ -48,13 +47,13 @@ class Recording < ApplicationRecord
 
       Metadatum.upsert_by_record_id(payload['record_id'], payload['metadata']) if payload.key?('metadata')
 
-      if payload.has_key?("playback")
+      if payload.key?("playback")
         playbacks = payload["playback"]
         playbacks = [playbacks] unless playbacks.is_a?(Array)
 
         playbacks.each do |playback|
           format = PlaybackFormat.find_or_create_by(recording: recording, format: playback["format"])
-          format.update_attributes(
+          format.update(
             url: URI(playback["link"]).request_uri,
             length: playback["duration"],
             processing_time: playback["processing_time"]
@@ -68,13 +67,16 @@ class Recording < ApplicationRecord
               # newer versions of bbb have a different format
               # old: {"images"=>{"image"=>["https://....png"]}}
               # new: {"images"=>{"image"=>[{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}]}}
-              if image.is_a?(String)
-                image = { "link" => image }
-              end
+              image = { 'link' => image } if image.is_a?(String)
 
+              begin
+                url = URI(image['link'].strip).request_uri
+              rescue URI::InvalidURIError
+                Rails.logger.warn("Invalid URL '#{image['link'].strip}'")
+              end
               thumb = Thumbnail.find_or_create_by(
                 playback_format: format,
-                url: URI(image["link"]).request_uri
+                url: url
               )
               thumb.update_attributes(
                 width: image["width"],
