@@ -54,7 +54,7 @@ class BigbluebuttonApiController < ApplicationController
     query = Recording.where(record_id: params[:recordID].split(','), state: %w[ published unpublished ])
     raise ApiError.new('notFound', 'We could not find recordings') if query.none?
 
-    query.where.not(published: publish).update_all(published: publish, state: (publish ? 'published' : 'unpublished'))
+    query.where.not(published: publish).update(published: publish, state: (publish ? 'published' : 'unpublished'))
 
     @published = publish
     render :publish_recordings
@@ -91,9 +91,9 @@ class BigbluebuttonApiController < ApplicationController
                      .where.not(state: 'deleted')
     raise ApiError.new('notFound', 'We could not find recordings') if query.none?
 
-    destroyed_count = query.update_all(state: 'deleted', deleted_at: Time.now)
+    destroyed_recs = query.update(state: 'deleted', deleted_at: Time.now)
 
-    @deleted = destroyed_count.positive?
+    @deleted = destroyed_recs.count.positive?
     render :delete_recordings
   end
 

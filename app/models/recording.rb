@@ -1,8 +1,12 @@
+require 'redis_publisher'
+
 class Recording < ApplicationRecord
   has_many :metadata, dependent: :destroy
   has_many :playback_formats, dependent: :destroy
 
   validates :state, inclusion: { in: %w[processing processed published unpublished deleted] }, allow_nil: true
+
+  after_save :publish_to_redis
 
   scope :with_recording_id_prefixes, lambda { |recording_ids|
     return none if recording_ids.empty?
@@ -85,6 +89,21 @@ class Recording < ApplicationRecord
             end
           end
         end
+      end
+    end
+  end
+
+  private
+
+  def publish_to_redis
+    publisher = RedisPublisher.new
+    if saved_changes.include?('state') && saved_changes['state'][1] == 'deleted'
+      publisher.deleted_recording(self)
+    elsif saved_changes.include?('published')
+      if published?
+        publisher.published_recording(self)
+      else
+        publisher.unpublished_recording(self)
       end
     end
   end
