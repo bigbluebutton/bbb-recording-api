@@ -102,25 +102,24 @@ class Recording < ApplicationRecord
   end
 
   def publish_metadata_to_redis
-    RedisPublisher.new.recording_updated(self)
+    RedisPublisher.recording_updated(self)
   end
 
   private
 
   def publish_to_redis_after_save
-    publisher = RedisPublisher.new
     if saved_changes.include?('state') && saved_changes['state'][1] == 'deleted'
-      publisher.recording_deleted(self)
+      RedisPublisher.recording_deleted(self)
     elsif saved_changes.include?('published')
       if published?
-        publisher.recording_published(self)
+        RedisPublisher.recording_published(self)
       else
-        publisher.recording_unpublished(self)
+        RedisPublisher.recording_unpublished(self)
       end
     end
   end
 
   def publish_to_redis_after_destroy
-    RedisPublisher.new.recording_deleted(self)
+    RedisPublisher.recording_deleted(self)
   end
 end

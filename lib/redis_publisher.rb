@@ -1,36 +1,29 @@
-require 'redis'
-
 class RedisPublisher
-
-  def initialize
-    @redis = Redis.new(
-      host: ENV['BBB_REDIS_HOST'],
-      port: ENV['BBB_REDIS_PORT'],
-      db: ENV['BBB_REDIS_DB'],
-      tcp_keepalive: 20
-    )
-    @channel = ENV['BBB_REDIS_PUBLISH_CHANNEL']
+  def self.recording_published(recording)
+    redis.publish channel, make_event('PublishedRecordingSysMsg', recording).to_json
   end
 
-  def recording_published(recording)
-    @redis.publish @channel, event('PublishedRecordingSysMsg', recording).to_json
+  def self.recording_unpublished(recording)
+    redis.publish channel, make_event('UnpublishedRecordingSysMsg', recording).to_json
   end
 
-  def recording_unpublished(recording)
-    @redis.publish @channel, event('UnpublishedRecordingSysMsg', recording).to_json
+  def self.recording_deleted(recording)
+    redis.publish channel, make_event('DeletedRecordingSysMsg', recording).to_json
   end
 
-  def recording_deleted(recording)
-    @redis.publish @channel, event('DeletedRecordingSysMsg', recording).to_json
+  def self.recording_updated(recording)
+    redis.publish channel, make_event('UpdatedRecordingSysMsg', recording, true).to_json
   end
 
-  def recording_updated(recording)
-    @redis.publish @channel, event('UpdatedRecordingSysMsg', recording, true).to_json
+  def self.redis
+    Rails.application.config.redis
   end
 
-  private
+  def self.channel
+    ENV['BBB_REDIS_PUBLISH_CHANNEL']
+  end
 
-  def event(name, recording, meta = false)
+  def self.make_event(name, recording, meta = false)
     e = {
       envelope: {
         name: name,
