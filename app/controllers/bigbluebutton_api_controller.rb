@@ -81,6 +81,10 @@ class BigbluebuttonApiController < ApplicationController
     end
 
     @updated = !(add_metadata.empty? && remove_metadata.empty?)
+
+    # the update above won't trigger the hooks in the models, so we post to redis manually
+    Recording.metadata_updated(record_ids) if @updated
+
     render :update_recordings
   end
 

@@ -6,7 +6,8 @@ class Recording < ApplicationRecord
 
   validates :state, inclusion: { in: %w[processing processed published unpublished deleted] }, allow_nil: true
 
-  after_save :publish_to_redis
+  after_save :publish_to_redis_after_save
+  after_destroy :publish_to_redis_after_destroy
 
   scope :with_recording_id_prefixes, lambda { |recording_ids|
     return none if recording_ids.empty?
@@ -93,18 +94,33 @@ class Recording < ApplicationRecord
     end
   end
 
+  def self.metadata_updated(record_ids = [])
+    record_ids.each do |record_id|
+      rec = Recording.find_by(record_id: record_id)
+      rec.publish_metadata_to_redis if rec.present?
+    end
+  end
+
+  def publish_metadata_to_redis
+    RedisPublisher.new.recording_updated(self)
+  end
+
   private
 
-  def publish_to_redis
+  def publish_to_redis_after_save
     publisher = RedisPublisher.new
     if saved_changes.include?('state') && saved_changes['state'][1] == 'deleted'
-      publisher.deleted_recording(self)
+      publisher.recording_deleted(self)
     elsif saved_changes.include?('published')
       if published?
-        publisher.published_recording(self)
+        publisher.recording_published(self)
       else
-        publisher.unpublished_recording(self)
+        publisher.recording_unpublished(self)
       end
     end
+  end
+
+  def publish_to_redis_after_destroy
+    RedisPublisher.new.recording_deleted(self)
   end
 end

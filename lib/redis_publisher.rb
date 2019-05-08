@@ -12,22 +12,26 @@ class RedisPublisher
     @channel = ENV['BBB_REDIS_PUBLISH_CHANNEL']
   end
 
-  def published_recording(recording)
+  def recording_published(recording)
     @redis.publish @channel, event('PublishedRecordingSysMsg', recording).to_json
   end
 
-  def unpublished_recording(recording)
+  def recording_unpublished(recording)
     @redis.publish @channel, event('UnpublishedRecordingSysMsg', recording).to_json
   end
 
-  def deleted_recording(recording)
+  def recording_deleted(recording)
     @redis.publish @channel, event('DeletedRecordingSysMsg', recording).to_json
+  end
+
+  def recording_updated(recording)
+    @redis.publish @channel, event('UpdatedRecordingSysMsg', recording, true).to_json
   end
 
   private
 
-  def event(name, recording)
-    {
+  def event(name, recording, meta = false)
+    e = {
       envelope: {
         name: name,
         routing: {
@@ -43,5 +47,7 @@ class RedisPublisher
         }
       }
     }
+    e[:core][:body][:metadata] = recording.metadata if meta
+    e
   end
 end
