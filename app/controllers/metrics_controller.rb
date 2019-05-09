@@ -6,7 +6,7 @@ class MetricsController < ApplicationController
 
     recording = Recording.find_by(record_id: params[:recordID].split(',')[0])
     if recording.present?
-      filename = "/var/bigbluebutton/events/#{recording.record_id}/data.json"
+      filename = recording.metrics_file_path
       if File.exist?(filename)
         data = File.read(filename)
 
