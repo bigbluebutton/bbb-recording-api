@@ -1,4 +1,4 @@
-class BigbluebuttonApiController < ApplicationController
+class RecordingsController < ApplicationController
   before_action :parse_metadata
 
   def getRecordings
