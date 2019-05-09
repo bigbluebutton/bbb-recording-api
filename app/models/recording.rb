@@ -28,6 +28,7 @@ class Recording < ApplicationRecord
 
       recording.meeting_id = payload['external_meeting_id'] if payload.key?('external_meeting_id')
 
+      # TODO: changing the states like this might be wrong if there's more than 1 playback format
       case header['name']
       when /^archive_/, /^sanity_/, 'process_started'
         recording.state = 'processing'
@@ -57,7 +58,7 @@ class Recording < ApplicationRecord
         playbacks.each do |playback|
           format = PlaybackFormat.find_or_create_by(recording: recording, format: playback["format"])
           format.update(
-            url: URI(playback["link"]).request_uri,
+            url: URI(playback["link"].strip).request_uri,
             length: playback["duration"],
             processing_time: playback["processing_time"]
           )
@@ -81,10 +82,10 @@ class Recording < ApplicationRecord
                 playback_format: format,
                 url: url
               )
-              thumb.update_attributes(
-                width: image["width"],
-                height: image["height"],
-                alt: image["alt"],
+              thumb.update(
+                width: image['width'],
+                height: image['height'],
+                alt: image['alt'],
                 sequence: i
               )
             end
