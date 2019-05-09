@@ -11,6 +11,7 @@ class ApplicationController < ActionController::API
   end
 
   before_action :checksum
+  before_action :set_url_prefix
   rescue_from ApiError, with: :api_error
 
   def api_error(exception)
@@ -27,5 +28,19 @@ class ApplicationController < ActionController::API
     return if our_checksum == params[:checksum]
 
     raise ApiError.new('checksumError', 'You did not pass the checksum security check')
+  end
+
+  def parse_metadata
+    @metadata = {}
+    params.each do |key, value|
+      next unless key.start_with?('meta_')
+
+      key = key[5..-1]
+      @metadata[key] = value
+    end
+  end
+
+  def set_url_prefix
+    @url_prefix = "#{request.protocol}#{request.host}"
   end
 end

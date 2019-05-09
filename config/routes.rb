@@ -17,4 +17,9 @@ Rails.application.routes.draw do
       to: 'recordings#deleteRecordings',
       as: 'recordings_delete_recordings',
       defaults: { format: 'xml' }
+
+  get "#{base}/getMetrics",
+      to: 'metrics#getMetrics',
+      as: 'metrics_get_metrics',
+      defaults: { format: 'json' }
 end

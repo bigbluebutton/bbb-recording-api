@@ -30,7 +30,6 @@ class RecordingsController < ApplicationController
     end
 
     @recordings = query.order(starttime: :desc).all
-    @url_prefix = "#{request.protocol}#{request.host}"
     render :get_recordings
   end
 
@@ -88,17 +87,5 @@ class RecordingsController < ApplicationController
 
     @deleted = destroyed_recs.count.positive?
     render :delete_recordings
-  end
-
-  private
-
-  def parse_metadata
-    @metadata = {}
-    params.each do |key, value|
-      next unless key.start_with?('meta_')
-
-      key = key[5..-1]
-      @metadata[key] = value
-    end
   end
 end
