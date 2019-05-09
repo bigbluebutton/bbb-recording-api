@@ -1,12 +1,12 @@
-class MetricsController < ApplicationController
+class DataController < ApplicationController
   before_action :parse_metadata
 
-  def getMetrics
+  def getData
     raise ApiError.new('missingParamRecordID', 'You must specify a recordID.') if params[:recordID].blank?
 
     recording = Recording.find_by(record_id: params[:recordID].split(',')[0])
     if recording.present?
-      filename = recording.metrics_file_path
+      filename = recording.data_file_path
       if File.exist?(filename)
         data = File.read(filename)
 

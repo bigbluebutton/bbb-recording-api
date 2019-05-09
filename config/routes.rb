@@ -18,8 +18,8 @@ Rails.application.routes.draw do
       as: 'recordings_delete_recordings',
       defaults: { format: 'xml' }
 
-  get "#{base}/getMetrics",
-      to: 'metrics#getMetrics',
-      as: 'metrics_get_metrics',
+  get "#{base}/getData",
+      to: 'data#getData',
+      as: 'data_get_data',
       defaults: { format: 'json' }
 end

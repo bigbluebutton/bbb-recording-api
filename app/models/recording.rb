@@ -65,7 +65,7 @@ class Recording < ApplicationRecord
     RedisPublisher.recording_updated(self)
   end
 
-  def metrics_file_path
+  def data_file_path
     "/var/bigbluebutton/events/#{record_id}/data.json"
   end
 
