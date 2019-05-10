@@ -7,6 +7,7 @@ class Recording < ApplicationRecord
 
   validates :state, inclusion: { in: %w[processing processed published unpublished deleted] },
                     allow_nil: true
+  validates :record_id, uniqueness: true
 
   after_save :publish_to_redis_after_save
   after_destroy :publish_to_redis_after_destroy

@@ -4,6 +4,8 @@ class Datum < ApplicationRecord
   belongs_to :recording, foreign_key: 'record_id', primary_key: 'record_id',
                          inverse_of: 'datum', required: false
 
+  validates :record_id, uniqueness: true
+
   def self.sync_from_redis(message)
     header = message['header']
     payload = message['payload']
