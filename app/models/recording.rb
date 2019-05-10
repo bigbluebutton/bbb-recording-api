@@ -3,8 +3,10 @@ require 'redis_publisher'
 class Recording < ApplicationRecord
   has_many :metadata, dependent: :destroy
   has_many :playback_formats, dependent: :destroy
+  has_one :datum, dependent: :destroy, inverse_of: 'recording', required: false
 
-  validates :state, inclusion: { in: %w[processing processed published unpublished deleted] }, allow_nil: true
+  validates :state, inclusion: { in: %w[processing processed published unpublished deleted] },
+                    allow_nil: true
 
   after_save :publish_to_redis_after_save
   after_destroy :publish_to_redis_after_destroy

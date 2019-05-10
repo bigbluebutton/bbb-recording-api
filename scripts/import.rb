@@ -3,7 +3,8 @@
 rails_environment_path = File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
 
 require rails_environment_path
-require "redis"
+require 'redis'
+require 'bbbevents'
 
 # hack into #to_hash so we don't lose the attributes in thumbnails
 # it's either this or using a more complex library like nokogiri
@@ -34,14 +35,18 @@ trap("INT") do
 end
 
 redis_channel = "bigbluebutton:from-rap"
-paths = [
+metadata_paths = [
   "/var/bigbluebutton/published/**/metadata.xml",
   "/var/bigbluebutton/unpublished/**/metadata.xml"
+]
+events_paths = [
+  "/var/bigbluebutton/events/**/events.xml"
 ]
 
 redis = Redis.new(host: ENV["BBB_REDIS_HOST"], port: ENV["BBB_REDIS_PORT"], db: ENV["BBB_REDIS_DB"])
 
-Dir[*paths].each do|metadata_path|
+Rails.logger.info "Importing recordings"
+Dir[*metadata_paths].each do |metadata_path|
   matched = metadata_path.match(/([^\/]+)\/([^\/]+)\/([^\/]+)\/metadata.xml$/)
   scope = matched[1]
   format = matched[2]
@@ -57,7 +62,7 @@ Dir[*paths].each do|metadata_path|
       key
     end
   }
-  metadata_xml.deep_transform_values!{ |v| v.is_a?(String) ? v.strip : v }
+  metadata_xml.deep_transform_values! { |v| v.is_a?(String) ? v.strip : v }
 
   if scope == "unpublished"
     origin = File.dirname(metadata_path)
@@ -69,27 +74,50 @@ Dir[*paths].each do|metadata_path|
   event = {
     header: {
       timestamp: DateTime.now.to_i,
-      name: "publish_ended",
+      name: 'publish_ended',
       current_time: DateTime.now.to_i,
-      version: "0.0.1"
+      version: '0.0.1'
     }, payload: {
       success: true,
       step_time: 0, # ?
-      playback: metadata_xml["playback"],
-      metadata: metadata_xml["meta"],
-      start_time: metadata_xml["start_time"].to_i,
-      end_time: metadata_xml["end_time"].to_i,
-      participants: metadata_xml["participants"].to_i,
-      raw_size: metadata_xml["raw_size"],
+      playback: metadata_xml['playback'],
+      metadata: metadata_xml['meta'],
+      start_time: metadata_xml['start_time'].to_i,
+      end_time: metadata_xml['end_time'].to_i,
+      participants: metadata_xml['participants'].to_i,
+      raw_size: metadata_xml['raw_size'],
       workflow: format,
-      external_meeting_id: metadata_xml["meta"]["meetingId"],
-      published: metadata_xml["published"] == "true",
+      external_meeting_id: metadata_xml['meta']['meetingId'],
+      published: metadata_xml['published'] == 'true',
       record_id: record_id,
       meeting_id: record_id
     }
   }
 
   Rails.logger.info "Importing #{scope}/#{format}/#{record_id}"
+  redis.publish redis_channel, event.to_json
+end
+Rails.logger.info "Done importing recordings"
+
+Rails.logger.info "Importing data"
+Dir[*events_paths].each do |events_path|
+  matched = events_path.match(/([^\/]+)\/events.xml$/)
+  record_id = matched[1]
+
+  Rails.logger.info "Importing events from #{events_path}"
+  data = BBBEvents.parse(events_path)
+
+  event = {
+    header: {
+      timestamp: DateTime.now.to_i,
+      name: 'data_published',
+      current_time: DateTime.now.to_i,
+      version: '0.0.1'
+    }, payload: {
+      record_id: record_id,
+      data: data
+    }
+  }
   redis.publish redis_channel, event.to_json
 end
 
