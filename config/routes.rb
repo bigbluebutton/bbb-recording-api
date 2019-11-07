@@ -1,25 +1,29 @@
 Rails.application.routes.draw do
   base = ENV.fetch('BBB_API_BASEPATH')
 
-  get "#{base}/getRecordings",
-      to: 'recordings#getRecordings',
-      as: 'recordings_get_recordings',
-      defaults: { format: 'xml' }
-  get "#{base}/publishRecordings",
-      to: 'recordings#publishRecordings',
-      as: 'recordings_publish_recordings',
-      defaults: { format: 'xml' }
-  get "#{base}/updateRecordings",
-      to: 'recordings#updateRecordings',
-      as: 'recordings_update_recordings',
-      defaults: { format: 'xml' }
-  get "#{base}/deleteRecordings",
-      to: 'recordings#deleteRecordings',
-      as: 'recordings_delete_recordings',
-      defaults: { format: 'xml' }
+  # Remove base first slash and replace following slashes with underscore.
+  path_prefix = base.gsub(/^\//, '').gsub(/\//, '_')
 
-  get "#{base}/getData",
-      to: 'data#getData',
-      as: 'data_get_data',
-      defaults: { format: 'json' }
+  scope as: path_prefix, path: base do
+    get "getRecordings",
+        to: 'recordings#getRecordings',
+        as: 'get_recordings',
+        defaults: { format: 'xml' }
+    get "publishRecordings",
+        to: 'recordings#publishRecordings',
+        as: 'publish_recordings',
+        defaults: { format: 'xml' }
+    get "updateRecordings",
+        to: 'recordings#updateRecordings',
+        as: 'update_recordings',
+        defaults: { format: 'xml' }
+    get "deleteRecordings",
+        to: 'recordings#deleteRecordings',
+        as: 'delete_recordings',
+        defaults: { format: 'xml' }
+    get "getData",
+        to: 'data#getData',
+        as: 'get_data',
+        defaults: { format: 'json' }
+  end
 end
