@@ -73,9 +73,9 @@ Dir[*metadata_paths].each do |metadata_path|
 
   event = {
     header: {
-      timestamp: DateTime.now.to_i,
+      timestamp: Time.now.to_i,
       name: 'publish_ended',
-      current_time: DateTime.now.to_i,
+      current_time: Time.now.to_i,
       version: '0.0.1'
     }, payload: {
       success: true,
@@ -109,9 +109,9 @@ Dir[*events_paths].each do |events_path|
 
   event = {
     header: {
-      timestamp: DateTime.now.to_i,
+      timestamp: Time.now.to_i,
       name: 'data_published',
-      current_time: DateTime.now.to_i,
+      current_time: Time.now.to_i,
       version: '0.0.1'
     }, payload: {
       record_id: record_id,
