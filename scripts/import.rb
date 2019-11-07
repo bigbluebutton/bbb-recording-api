@@ -52,7 +52,6 @@ Dir[*metadata_paths].each do |metadata_path|
   format = matched[2]
   record_id = matched[3]
 
-
   xml = File.open(metadata_path)
   metadata_xml = Hash.from_xml(xml)
   metadata_xml = metadata_xml['recording']
