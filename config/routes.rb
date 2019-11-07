@@ -5,23 +5,23 @@ Rails.application.routes.draw do
   path_prefix = base.gsub(/^\//, '').gsub(/\//, '_')
 
   scope as: path_prefix, path: base do
-    get "getRecordings",
+    get 'getRecordings',
         to: 'recordings#getRecordings',
         as: 'get_recordings',
         defaults: { format: 'xml' }
-    get "publishRecordings",
+    get 'publishRecordings',
         to: 'recordings#publishRecordings',
         as: 'publish_recordings',
         defaults: { format: 'xml' }
-    get "updateRecordings",
+    get 'updateRecordings',
         to: 'recordings#updateRecordings',
         as: 'update_recordings',
         defaults: { format: 'xml' }
-    get "deleteRecordings",
+    get 'deleteRecordings',
         to: 'recordings#deleteRecordings',
         as: 'delete_recordings',
         defaults: { format: 'xml' }
-    get "getData",
+    get 'getData',
         to: 'data#getData',
         as: 'get_data',
         defaults: { format: 'json' }

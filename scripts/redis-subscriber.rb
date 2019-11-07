@@ -53,4 +53,4 @@ redis.subscribe(redis_channel) do |on|
   end
 end
 
-Rails.logger.info "Ended"
+Rails.logger.info 'Ended'

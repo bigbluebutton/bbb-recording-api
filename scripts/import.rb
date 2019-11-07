@@ -27,44 +27,45 @@ class Hash
   end
 end
 
-Rails.logger.info "Starting"
+Rails.logger.info 'Starting'
 
-trap("INT") do
-  puts "Script terminated by user"
+trap('INT') do
+  puts 'Script terminated by user'
   exit
 end
 
-redis_channel = "bigbluebutton:from-rap"
+redis_channel = 'bigbluebutton:from-rap'
 metadata_paths = [
-  "/var/bigbluebutton/published/**/metadata.xml",
-  "/var/bigbluebutton/unpublished/**/metadata.xml"
+  '/var/bigbluebutton/published/**/metadata.xml',
+  '/var/bigbluebutton/unpublished/**/metadata.xml'
 ]
 events_paths = [
-  "/var/bigbluebutton/events/**/events.xml"
+  '/var/bigbluebutton/events/**/events.xml'
 ]
 
-redis = Redis.new(host: ENV["BBB_REDIS_HOST"], port: ENV["BBB_REDIS_PORT"], db: ENV["BBB_REDIS_DB"])
+redis = Redis.new(host: ENV['BBB_REDIS_HOST'], port: ENV['BBB_REDIS_PORT'], db: ENV['BBB_REDIS_DB'])
 
-Rails.logger.info "Importing recordings"
+Rails.logger.info 'Importing recordings'
 Dir[*metadata_paths].each do |metadata_path|
   matched = metadata_path.match(/([^\/]+)\/([^\/]+)\/([^\/]+)\/metadata.xml$/)
   scope = matched[1]
   format = matched[2]
   record_id = matched[3]
 
+
   xml = File.open(metadata_path)
   metadata_xml = Hash.from_xml(xml)
-  metadata_xml = metadata_xml["recording"]
-  metadata_xml["playback"].deep_transform_keys!{ |key|
-    if key == "__content__"
-      "link"
+  metadata_xml = metadata_xml['recording']
+  metadata_xml['playback'].deep_transform_keys!{ |key|
+    if key == '__content__'
+      'link'
     else
       key
     end
   }
   metadata_xml.deep_transform_values! { |v| v.is_a?(String) ? v.strip : v }
 
-  if scope == "unpublished"
+  if scope == 'unpublished'
     origin = File.dirname(metadata_path)
     destination = File.dirname(metadata_path).gsub(/unpublished/, 'published')
     Rails.logger.info "Moving #{origin} to #{destination}"
@@ -97,9 +98,9 @@ Dir[*metadata_paths].each do |metadata_path|
   Rails.logger.info "Importing #{scope}/#{format}/#{record_id}"
   redis.publish redis_channel, event.to_json
 end
-Rails.logger.info "Done importing recordings"
+Rails.logger.info 'Done importing recordings'
 
-Rails.logger.info "Importing data"
+Rails.logger.info 'Importing data'
 Dir[*events_paths].each do |events_path|
   matched = events_path.match(/([^\/]+)\/events.xml$/)
   record_id = matched[1]
@@ -121,4 +122,4 @@ Dir[*events_paths].each do |events_path|
   redis.publish redis_channel, event.to_json
 end
 
-Rails.logger.info "Ended"
+Rails.logger.info 'Ended'
