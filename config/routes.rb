@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   base = ENV.fetch('BBB_API_BASEPATH')
 
   # Remove base first slash and replace following slashes with underscore.
-  path_prefix = base.gsub(/^\//, '').gsub(/\//, '_')
+  path_prefix = base.gsub(%r{^/}, '').gsub(%r{/}, '_')
 
   scope as: path_prefix, path: base do
     get 'getRecordings',

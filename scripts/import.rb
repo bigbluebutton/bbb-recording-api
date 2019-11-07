@@ -47,7 +47,7 @@ redis = Redis.new(host: ENV['BBB_REDIS_HOST'], port: ENV['BBB_REDIS_PORT'], db: 
 
 Rails.logger.info 'Importing recordings'
 Dir[*metadata_paths].each do |metadata_path|
-  matched = metadata_path.match(/([^\/]+)\/([^\/]+)\/([^\/]+)\/metadata.xml$/)
+  matched = metadata_path.match(%r{([^/]+)/([^/]+)/([^/]+)/metadata.xml$})
   scope = matched[1]
   format = matched[2]
   record_id = matched[3]
@@ -101,7 +101,7 @@ Rails.logger.info 'Done importing recordings'
 
 Rails.logger.info 'Importing data'
 Dir[*events_paths].each do |events_path|
-  matched = events_path.match(/([^\/]+)\/events.xml$/)
+  matched = events_path.match(%r{([^/]+)/events.xml$})
   record_id = matched[1]
 
   Rails.logger.info "Importing events from #{events_path}"
