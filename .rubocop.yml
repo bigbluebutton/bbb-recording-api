@@ -33,3 +33,7 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 Style/NumericLiterals:
   Enabled: false
+Naming/AccessorMethodName:
+  Exclude:
+  - app/controllers/recordings_controller.rb
+  - app/controllers/data_controller.rb
