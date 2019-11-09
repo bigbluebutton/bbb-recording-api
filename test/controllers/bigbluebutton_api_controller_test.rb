@@ -63,7 +63,6 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
           assert_equal imgs.length, pf.thumbnails.count
           imgs.each_with_index do |img, i|
             t = thumbnails("fred_room_#{pf.format}_thumb#{i + 1}")
-            img = imgs[i]
             assert_equal img['alt'], t.alt
             assert_equal img['height'], t.height.to_s
             assert_equal img['width'], t.width.to_s
@@ -260,7 +259,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
     assert_select 'response>updated', 'true'
 
     assert_raises ActiveRecord::RecordNotFound do
-      m = metadata(:fred_room_meta_gl_listed)
+      metadata(:fred_room_meta_gl_listed)
     end
   end
 
