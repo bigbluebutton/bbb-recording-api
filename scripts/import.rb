@@ -12,6 +12,7 @@ require 'bbbevents'
 module ActiveSupport
   class XMLConverter
     private
+
     def become_content?(value)
       value['type'] == 'file' || (value['__content__'] && (value.keys.size == 1 && value['__content__'].present?))
     end
@@ -55,13 +56,13 @@ Dir[*metadata_paths].each do |metadata_path|
   xml = File.open(metadata_path)
   metadata_xml = Hash.from_xml(xml)
   metadata_xml = metadata_xml['recording']
-  metadata_xml['playback'].deep_transform_keys!{ |key|
+  metadata_xml['playback'].deep_transform_keys! do |key|
     if key == '__content__'
       'link'
     else
       key
     end
-  }
+  end
   metadata_xml.deep_transform_values! { |v| v.is_a?(String) ? v.strip : v }
 
   if scope == 'unpublished'

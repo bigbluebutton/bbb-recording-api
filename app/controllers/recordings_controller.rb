@@ -39,7 +39,7 @@ class RecordingsController < ApplicationController
 
     publish = params[:publish].casecmp('true').zero?
 
-    query = Recording.where(record_id: params[:recordID].split(','), state: %w[ published unpublished ])
+    query = Recording.where(record_id: params[:recordID].split(','), state: %w[published unpublished])
     raise ApiError.new('notFound', 'We could not find recordings') if query.none?
 
     query.where.not(published: publish).update(published: publish, state: (publish ? 'published' : 'unpublished'))

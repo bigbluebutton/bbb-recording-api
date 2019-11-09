@@ -62,7 +62,7 @@ class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
           imgs = css_select format_el, 'preview>images>image'
           assert_equal imgs.length, pf.thumbnails.count
           imgs.each_with_index do |img, i|
-            t = thumbnails("fred_room_#{pf.format}_thumb#{i+1}")
+            t = thumbnails("fred_room_#{pf.format}_thumb#{i + 1}")
             img = imgs[i]
             assert_equal img['alt'], t.alt
             assert_equal img['height'], t.height.to_s
