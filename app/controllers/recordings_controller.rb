@@ -79,7 +79,7 @@ class RecordingsController < ApplicationController
                      .where.not(state: 'deleted')
     raise ApiError.new('notFound', 'We could not find recordings') if query.none?
 
-    destroyed_recs = query.update(state: 'deleted', deleted_at: Time.now)
+    destroyed_recs = query.update(state: 'deleted', deleted_at: Time.zone.now)
 
     @deleted = destroyed_recs.count.positive?
     render :delete_recordings
