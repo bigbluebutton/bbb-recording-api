@@ -510,8 +510,16 @@ class RecordingTest < ActiveSupport::TestCase
     assert_equal pf.length, 29185
     assert_equal pf.processing_time, 5999
     assert_equal pf.thumbnails.count, 2
-    assert_not_nil pf.thumbnails.find_by(url: '/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png')
-    assert_not_nil pf.thumbnails.find_by(url: '/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-2.png')
+
+    thumbnail_url = '/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284'\
+                    '/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905'\
+                    '/thumbnails/thumb-1.png'
+    assert_not_nil pf.thumbnails.find_by(url: thumbnail_url)
+
+    thumbnail_url = '/presentation/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284'\
+                    '/presentation/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905'\
+                    '/thumbnails/thumb-2.png'
+    assert_not_nil pf.thumbnails.find_by(url:thumbnail_url )
 
     pf = target.playback_formats.find_by(format: 'podcast')
     assert_not_nil pf
@@ -519,7 +527,11 @@ class RecordingTest < ActiveSupport::TestCase
     assert_equal pf.length, 22999
     assert_equal pf.processing_time, 9919
     assert_equal pf.thumbnails.count, 1
-    assert_not_nil pf.thumbnails.find_by(url: '/podcast/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284/podcast/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905/thumbnails/thumb-1.png')
+
+    thumbnail_url = '/podcast/a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284'\
+                    '/podcast/d2d9a672040fbde2a47a10bf6c37b6a4b5ae187f-1542719370905'\
+                    '/thumbnails/thumb-1.png'
+    assert_not_nil pf.thumbnails.find_by(url: thumbnail_url)
   end
 
   # test '.sync_from_redis updates an existent recording and all associated models on publish_ended'
