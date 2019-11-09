@@ -1,7 +1,7 @@
 class RecordingsController < ApplicationController
   before_action :parse_metadata
 
-  def getRecordings
+  def get_recordings
     query = Recording.includes(playback_formats: [:thumbnails], metadata: [])
     if params[:recordID].present?
       query = query.with_recording_id_prefixes(params[:recordID].split(','))
@@ -29,7 +29,7 @@ class RecordingsController < ApplicationController
     render :get_recordings
   end
 
-  def publishRecordings
+  def publish_recordings
     raise ApiError.new('missingParamRecordID', 'You must specify a recordID.') if params[:recordID].blank?
     raise ApiError.new('missingParamPublish', 'You must specify a publish value true or false.') if params[:publish].blank?
 
@@ -44,7 +44,7 @@ class RecordingsController < ApplicationController
     render :publish_recordings
   end
 
-  def updateRecordings
+  def update_recordings
     raise ApiError.new('missingParamRecordID', 'You must specify a recordID.') if params[:recordID].blank?
 
     record_ids = params[:recordID].split(',')
@@ -72,7 +72,7 @@ class RecordingsController < ApplicationController
     render :update_recordings
   end
 
-  def deleteRecordings
+  def delete_recordings
     raise ApiError.new('missingParamRecordID', 'You must specify a recordID.') if params[:recordID].blank?
 
     query = Recording.where(record_id: params[:recordID].split(','))
