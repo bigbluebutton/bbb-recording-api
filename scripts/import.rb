@@ -22,7 +22,7 @@ end
 # adapted from https://gist.github.com/chris/b4138603a8fe17e073c6bc073eb17785
 class Hash
   def deep_transform_values!(&block)
-    self.transform_values! do |value|
+    transform_values! do |value|
       value.is_a?(Hash) ? value.deep_transform_values!(&block) : yield(value)
     end
   end
