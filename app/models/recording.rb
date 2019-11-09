@@ -91,32 +91,32 @@ class Recording < ApplicationRecord
       processing_time: playback['processing_time']
     )
 
-    if playback.key?('extensions')
-      images = playback['extensions']['preview']['images']['image']
-      images = [images] unless images.is_a?(Array)
+    return unless playback.key?('extensions')
 
-      images.each_with_index do |image, i|
-        # newer versions of bbb have a different format
-        # old: {"images"=>{"image"=>["https://....png"]}}
-        # new: {"images"=>{"image"=>[{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}]}}
-        image = { 'link' => image } if image.is_a?(String)
+    images = playback['extensions']['preview']['images']['image']
+    images = [images] unless images.is_a?(Array)
 
-        begin
-          url = URI(image['link'].strip).request_uri
-        rescue URI::InvalidURIError
-          Rails.logger.warn("Invalid URL '#{image['link'].strip}'")
-        end
-        thumb = Thumbnail.find_or_create_by(
-          playback_format: format,
-          url: url
-        )
-        thumb.update(
-          width: image['width'],
-          height: image['height'],
-          alt: image['alt'],
-          sequence: i
-        )
+    images.each_with_index do |image, i|
+      # newer versions of bbb have a different format
+      # old: {"images"=>{"image"=>["https://....png"]}}
+      # new: {"images"=>{"image"=>[{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}]}}
+      image = { 'link' => image } if image.is_a?(String)
+
+      begin
+        url = URI(image['link'].strip).request_uri
+      rescue URI::InvalidURIError
+        Rails.logger.warn("Invalid URL '#{image['link'].strip}'")
       end
+      thumb = Thumbnail.find_or_create_by(
+        playback_format: format,
+        url: url
+      )
+      thumb.update(
+        width: image['width'],
+        height: image['height'],
+        alt: image['alt'],
+        sequence: i
+      )
     end
   end
 
