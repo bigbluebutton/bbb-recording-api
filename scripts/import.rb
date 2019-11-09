@@ -6,7 +6,7 @@ require rails_environment_path
 require 'redis'
 require 'bbbevents'
 
-# hack into #to_hash so we don't lose the attributes in thumbnails
+# HACK: into #to_hash so we don't lose the attributes in thumbnails
 # it's either this or using a more complex library like nokogiri
 # see https://stackoverflow.com/questions/19309465/keeping-attributes-when-converting-xml-to-ruby-hash#29431089
 module ActiveSupport
