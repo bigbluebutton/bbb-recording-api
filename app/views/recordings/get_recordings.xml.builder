@@ -32,7 +32,7 @@ xml.response do
               xml.url "#{@url_prefix}#{format.url}"
               xml.length format.length
               xml.processingTime format.processing_time unless format.processing_time.nil?
-              if format.thumbnails.length > 0
+              unless format.thumbnails.empty?
                 xml.preview do
                   xml.images do
                     format.thumbnails.each do |thumbnail|
