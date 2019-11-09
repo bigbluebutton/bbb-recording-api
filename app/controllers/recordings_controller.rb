@@ -10,11 +10,7 @@ class RecordingsController < ApplicationController
     end
 
     # processing|processed|published|unpublished|deleted
-    if params[:state].present?
-      states = params[:state].split(',')
-    else
-      states = %w[published unpublished]
-    end
+    states = params[:state].present? ? params[:state].split(',') : %w[published unpublished]
     query = query.where(state: states) unless states.include?('any')
 
     # filters by metadata
