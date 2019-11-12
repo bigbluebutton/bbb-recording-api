@@ -12,16 +12,16 @@ trap('INT') do
   exit
 end
 
-target_events = [
-  'archive_started',
-  'archive_ended',
-  'sanity_started',
-  'sanity_ended',
-  'process_started',
-  'process_ended',
-  'publish_started',
-  'publish_ended',
-  'data_published'
+target_events = %w[
+  archive_started
+  archive_ended
+  sanity_started
+  sanity_ended
+  process_started
+  process_ended
+  publish_started
+  publish_ended
+  data_publishe
 ]
 redis_channel = 'bigbluebutton:from-rap'
 
@@ -53,4 +53,4 @@ redis.subscribe(redis_channel) do |on|
   end
 end
 
-Rails.logger.info "Ended"
+Rails.logger.info 'Ended'

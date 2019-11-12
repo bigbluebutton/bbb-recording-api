@@ -11,10 +11,10 @@ class Datum < ApplicationRecord
     payload = message['payload']
     record_id = payload['record_id']
 
-    if header['name'] == 'data_published'
-      datum = Datum.lock.find_or_initialize_by(record_id: record_id)
-      datum.raw_data = payload['data']
-      datum.save!
-    end
+    return unless header['name'] == 'data_published'
+
+    datum = Datum.lock.find_or_initialize_by(record_id: record_id)
+    datum.raw_data = payload['data']
+    datum.save!
   end
 end
