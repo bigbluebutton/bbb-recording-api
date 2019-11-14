@@ -54,6 +54,7 @@ class Recording < ApplicationRecord
 
       recording.sync_metadata_from_redis(payload['metadata']) if payload.key?('metadata')
       recording.sync_playbacks_from_redis(payload['playback']) if payload.key?('playback')
+      recording
     end
   end
 
