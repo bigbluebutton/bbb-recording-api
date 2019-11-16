@@ -4,6 +4,9 @@ inherit_mode:
 AllCops:
   Exclude:
     - db/schema.rb
+Lint/ScriptPermission:
+  Exclude:
+  - scripts/*.rb
 Metrics/AbcSize:
   Max: 30
   Exclude:
@@ -13,15 +16,25 @@ Metrics/BlockLength:
     - "**/*.builder"
     - test/models/recording_test.rb
     - test/controllers/bigbluebutton_api_controller_test.rb
+Metrics/ClassLength:
+  Exclude:
+  - app/models/recording.rb
+  - test/models/recording_test.rb
+  - test/controllers/bigbluebutton_api_controller_test.rb
 Metrics/CyclomaticComplexity:
   Max: 12
 Metrics/LineLength:
   Max: 132
 Metrics/MethodLength:
   Max: 20
+Metrics/PerceivedComplexity:
+  Exclude:
+  - app/controllers/recordings_controller.rb
 Naming/AccessorMethodName:
   Exclude:
     - app/controllers/bigbluebutton_api_controller.rb
+    - app/controllers/recordings_controller.rb
+    - app/controllers/data_controller.rb
 Naming/MethodName:
   Exclude:
     - app/controllers/bigbluebutton_api_controller.rb
@@ -37,20 +50,3 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 Style/NumericLiterals:
   Enabled: false
-Naming/AccessorMethodName:
-  Exclude:
-  - app/controllers/recordings_controller.rb
-  - app/controllers/data_controller.rb
-Lint/ScriptPermission:
-  Exclude:
-  - scripts/*.rb
-Metrics/ClassLength:
-  Exclude:
-  - app/models/recording.rb
-  - test/models/recording_test.rb
-  - test/controllers/bigbluebutton_api_controller_test.rb
-Metrics/PerceivedComplexity:
-  Exclude:
-  - app/controllers/recordings_controller.rb
-
-
