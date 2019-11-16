@@ -39,3 +39,6 @@ Naming/AccessorMethodName:
   Exclude:
   - app/controllers/recordings_controller.rb
   - app/controllers/data_controller.rb
+Lint/ScriptPermission:
+  Exclude:
+  - scripts/*.rb
