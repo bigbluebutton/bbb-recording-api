@@ -6,6 +6,8 @@ AllCops:
     - db/schema.rb
 Metrics/AbcSize:
   Max: 30
+  Exclude:
+  - app/controllers/recordings_controller.rb
 Metrics/BlockLength:
   Exclude:
     - "**/*.builder"
@@ -47,3 +49,8 @@ Metrics/ClassLength:
   - app/models/recording.rb
   - test/models/recording_test.rb
   - test/controllers/bigbluebutton_api_controller_test.rb
+Metrics/PerceivedComplexity:
+  Exclude:
+  - app/controllers/recordings_controller.rb
+
+
