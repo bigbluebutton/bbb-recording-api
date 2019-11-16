@@ -32,20 +32,7 @@ class Recording < ApplicationRecord
       recording.meeting_id = payload['external_meeting_id'] if payload.key?('external_meeting_id')
 
       # TODO: changing the states like this might be wrong if there's more than 1 playback format
-      case header['name']
-      when /^archive_/, /^sanity_/, 'process_started'
-        recording.state = 'processing'
-        recording.published = false
-      when 'process_ended', 'publish_started'
-        recording.state = 'processed'
-        recording.published = false
-      when 'publish_ended'
-        recording.state = 'published'
-        recording.starttime = Time.at(Rational(payload['start_time'], 1000)).utc
-        recording.endtime = Time.at(Rational(payload['end_time'], 1000)).utc
-        recording.participants = payload['participants']
-        recording.published = true
-      end
+      update_recording_by_event_name(header['name'], recording, payload)
 
       # override attributes if present in the event
       recording.published = payload['published'] if payload.key?('published')
@@ -55,6 +42,23 @@ class Recording < ApplicationRecord
       recording.sync_metadata_from_redis(payload['metadata']) if payload.key?('metadata')
       recording.sync_playbacks_from_redis(payload['playback']) if payload.key?('playback')
       recording
+    end
+  end
+
+  def self.update_recording_by_event_name(event_name, recording, payload)
+    case event_name
+    when /^archive_/, /^sanity_/, 'process_started'
+      recording.state = 'processing'
+      recording.published = false
+    when 'process_ended', 'publish_started'
+      recording.state = 'processed'
+      recording.published = false
+    when 'publish_ended'
+      recording.state = 'published'
+      recording.starttime = Time.at(Rational(payload['start_time'], 1000)).utc
+      recording.endtime = Time.at(Rational(payload['end_time'], 1000)).utc
+      recording.participants = payload['participants']
+      recording.published = true
     end
   end
 
@@ -96,7 +100,10 @@ class Recording < ApplicationRecord
 
     images = playback['extensions']['preview']['images']['image']
     images = [images] unless images.is_a?(Array)
+    save_images(images, format)
+  end
 
+  def save_images(images, format)
     images.each_with_index do |image, i|
       # newer versions of bbb have a different format
       # old: {"images"=>{"image"=>["https://....png"]}}
