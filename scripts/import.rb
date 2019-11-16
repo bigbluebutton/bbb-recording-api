@@ -47,6 +47,41 @@ events_paths = [
 redis = Redis.new(host: ENV['BBB_REDIS_HOST'], port: ENV['BBB_REDIS_PORT'], db: ENV['BBB_REDIS_DB'])
 
 Rails.logger.info 'Importing recordings'
+
+def create_event_from_xml(record_id, metadata_xml, format)
+  {
+    header: create_event_header_from_xml,
+    payload: create_event_payload_from_xml(record_id, metadata_xml, format)
+  }
+end
+
+def create_event_header_from_xml
+  {
+    timestamp: Time.now.to_i,
+    name: 'publish_ended',
+    current_time: Time.now.to_i,
+    version: '0.0.1'
+  }
+end
+
+def create_event_payload_from_xml(record_id, metadata_xml, format)
+  {
+    success: true,
+    step_time: 0, # ?
+    playback: metadata_xml['playback'],
+    metadata: metadata_xml['meta'],
+    start_time: metadata_xml['start_time'].to_i,
+    end_time: metadata_xml['end_time'].to_i,
+    participants: metadata_xml['participants'].to_i,
+    raw_size: metadata_xml['raw_size'],
+    workflow: format,
+    external_meeting_id: metadata_xml['meta']['meetingId'],
+    published: metadata_xml['published'] == 'true',
+    record_id: record_id,
+    meeting_id: record_id
+  }
+end
+
 Dir[*metadata_paths].each do |metadata_path|
   matched = metadata_path.match(%r{([^/]+)/([^/]+)/([^/]+)/metadata.xml$})
   scope = matched[1]
@@ -72,29 +107,7 @@ Dir[*metadata_paths].each do |metadata_path|
     FileUtils.mv(origin, destination)
   end
 
-  event = {
-    header: {
-      timestamp: Time.now.to_i,
-      name: 'publish_ended',
-      current_time: Time.now.to_i,
-      version: '0.0.1'
-    }, payload: {
-      success: true,
-      step_time: 0, # ?
-      playback: metadata_xml['playback'],
-      metadata: metadata_xml['meta'],
-      start_time: metadata_xml['start_time'].to_i,
-      end_time: metadata_xml['end_time'].to_i,
-      participants: metadata_xml['participants'].to_i,
-      raw_size: metadata_xml['raw_size'],
-      workflow: format,
-      external_meeting_id: metadata_xml['meta']['meetingId'],
-      published: metadata_xml['published'] == 'true',
-      record_id: record_id,
-      meeting_id: record_id
-    }
-  }
-
+  event = create_event_from_xml(record_id, metadata_xml, format)
   Rails.logger.info "Importing #{scope}/#{format}/#{record_id}"
   redis.publish redis_channel, event.to_json
 end

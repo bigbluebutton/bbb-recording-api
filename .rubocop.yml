@@ -9,6 +9,8 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   Exclude:
     - "**/*.builder"
+    - test/models/recording_test.rb
+    - test/controllers/bigbluebutton_api_controller_test.rb
 Metrics/CyclomaticComplexity:
   Max: 12
 Metrics/LineLength:
