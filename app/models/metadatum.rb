@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: metadata
+#
+#  id           :integer          not null, primary key
+#  recording_id :integer
+#  key          :string
+#  value        :string
+#
+
 class Metadatum < ApplicationRecord
   belongs_to :recording
 

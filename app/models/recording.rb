@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: recordings
+#
+#  id           :integer          not null, primary key
+#  record_id    :string
+#  meeting_id   :string
+#  name         :string
+#  published    :boolean
+#  participants :integer
+#  state        :string
+#  starttime    :datetime
+#  endtime      :datetime
+#  deleted_at   :datetime
+#
+
 require 'redis_publisher'
 
 class Recording < ApplicationRecord
