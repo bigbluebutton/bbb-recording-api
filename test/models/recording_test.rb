@@ -1,11 +1,21 @@
 require 'test_helper'
 require 'recordings_helper'
-
+require 'redis_publisher'
 
 class RecordingTest < ActiveSupport::TestCase
 
   setup do
     @record_id = 'a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284'
+  end
+
+  def run
+    # Stub the Redis publisher calls, each tests case expects maximun 8 calls
+    # which is the number of events we have. See @all_event_names
+    mock = MiniTest::Mock.new
+    8.times.each { mock.expect :publish, true, [String, String] }
+    ::RedisPublisher.stub :redis, mock do
+      super
+    end
   end
 
   context '#sync_from_redis' do
