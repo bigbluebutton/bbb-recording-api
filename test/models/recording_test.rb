@@ -3,7 +3,6 @@ require 'recordings_helper'
 require 'redis_publisher'
 
 class RecordingTest < ActiveSupport::TestCase
-
   setup do
     @record_id = 'a0fcb226a234fccc45a9417f8d7c871792e25e1d-1542719370284'
   end
@@ -82,7 +81,6 @@ class RecordingTest < ActiveSupport::TestCase
           assert_equal meeting_name, recording.name
         end
       end
-
     end
 
     context 'with events from unpublished recording' do
@@ -143,7 +141,7 @@ class RecordingTest < ActiveSupport::TestCase
 
       context 'with events from a processed recording but not yet published' do
         setup do
-          @event_names = ['process_ended', 'publish_started']
+          @event_names = %w[process_ended publish_started]
         end
 
         should 'set the recording state as "processed"' do
@@ -162,7 +160,6 @@ class RecordingTest < ActiveSupport::TestCase
           end
         end
       end
-
     end
 
     context 'with events from published recording' do

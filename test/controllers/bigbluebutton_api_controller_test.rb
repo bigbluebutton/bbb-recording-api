@@ -2,7 +2,6 @@ require 'test_helper'
 require 'redis_publisher'
 
 class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
-
   def run
     # Stub the Redis publisher calls, each test case expects maximun 2 calls.
     mock = MiniTest::Mock.new
