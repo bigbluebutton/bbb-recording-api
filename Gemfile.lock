@@ -1,8 +1,9 @@
-PATH
-  remote: /usr/src/bbb-events
+GIT
+  remote: https://github.com/bigbluebutton/bbb-events.git
+  revision: 8d879171146b6c4d2f333a63c25bc4b89ea7c234
   specs:
-    bbbevents (1.0.0)
-      activesupport
+    bbbevents (1.2.0)
+      activesupport (>= 5.0.0.1, < 6.1)
 
 GEM
   remote: https://rubygems.org/
