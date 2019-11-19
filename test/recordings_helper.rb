@@ -12,7 +12,18 @@
 #
 def redis_event(name, finished: false, workflow: nil, record_id: nil)
   return redis_publish_ended_event if name == 'publish_ended'
-  event = {
+
+  event = redis_event_base(name, record_id)
+  if finished
+    event[:payload][:success] = true
+    event[:payload][:step_time] = 1336
+  end
+  event[:payload][:workflow] = workflow if workflow
+  event.deep_stringify_keys
+end
+
+def redis_event_base(name, record_id)
+  {
     header: {
       timestamp: 5161997873,
       name: name,
@@ -26,17 +37,9 @@ def redis_event(name, finished: false, workflow: nil, record_id: nil)
       meeting_id: record_id
     }
   }
-
-  if finished
-    event[:payload][:success] = true
-    event[:payload][:step_time] = 1336
-  end
-
-  event[:payload][:workflow] = workflow if workflow
-
-  event.deep_stringify_keys
 end
 
+# rubocop:disable Metrics/MethodLength
 def redis_publish_ended_event
   {
     header: {
@@ -93,3 +96,4 @@ def redis_publish_ended_event
     }
   }.deep_stringify_keys
 end
+# rubocop:enable Metrics/MethodLength

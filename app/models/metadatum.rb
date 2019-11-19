@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: metadata
+#
+#  id           :integer          not null, primary key
+#  recording_id :integer
+#  key          :string
+#  value        :string
+#
+
 class Metadatum < ApplicationRecord
   belongs_to :recording
 
@@ -20,7 +30,10 @@ class Metadatum < ApplicationRecord
     record_ids.each do |record_id|
       insert_records << [record_id_col, record_id]
     end
+    insert_metadatum(metadata, record_ids, insert_records)
+  end
 
+  def self.insert_metadatum(metadata, record_ids, insert_records)
     Metadatum.connection.insert(
       'INSERT INTO "metadata" ("recording_id", "key", "value") '\
         'WITH "new_metadata" AS '\

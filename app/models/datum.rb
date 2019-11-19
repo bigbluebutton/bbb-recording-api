@@ -1,3 +1,12 @@
+# == Schema Information
+#
+# Table name: data
+#
+#  id        :integer          not null, primary key
+#  record_id :string
+#  raw_data  :json
+#
+
 class Datum < ApplicationRecord
   # we do this through :record_id so we can parse data independently from recordings
   # data might have a recording or might not

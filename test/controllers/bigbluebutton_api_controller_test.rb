@@ -1,6 +1,16 @@
 require 'test_helper'
+require 'redis_publisher'
 
 class BigbluebuttonApiControllerTest < ActionDispatch::IntegrationTest
+  def run
+    # Stub the Redis publisher calls, each test case expects maximun 2 calls.
+    mock = MiniTest::Mock.new
+    2.times.each { mock.expect :publish, true, [String, String] }
+    ::RedisPublisher.stub :redis, mock do
+      super
+    end
+  end
+
   # getRecordings
   test 'getRecordings with no parameters returns checksum error' do
     get bigbluebutton_api_get_recordings_url
