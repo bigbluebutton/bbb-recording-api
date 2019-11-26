@@ -19,3 +19,16 @@ module ActiveSupport
     end
   end
 end
+
+module RedisStub
+  def run
+    # Stub the Redis publisher calls, each test case expects maximun 8 calls.
+    redis_calls = 8
+    mock = MiniTest::Mock.new
+    redis_calls.times.each { mock.expect :publish, true, [String, String] }
+    ::RedisPublisher.stub :redis, mock do
+      super
+    end
+  end
+end
+
