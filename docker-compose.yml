@@ -1,0 +1,39 @@
+version: '2'
+services:
+
+  dev:
+    container_name: bigbluebutton-recording-api_dev
+    build: .
+    image: bigbluebutton-recording-api:dev
+    tty: true
+    depends_on:
+      - subscriber
+    ports:
+      - "3000:80"
+    env_file:
+      - ./.env
+    volumes:
+      - ./:/usr/src/app
+      - /var/bigbluebutton:/var/bigbluebutton
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"
+
+  subscriber:
+    container_name: bigbluebutton-recording-api_subscriber
+    image: bigbluebutton-recording-api:dev
+    tty: true
+    env_file:
+      - ./.env
+    volumes:
+      - ./:/usr/src/app
+    command: bash -c "bundle exec ruby scripts/redis-subscriber.rb"
+
+  import:
+    container_name: bigbluebutton-recording-api_import
+    image: bigbluebutton-recording-api:dev
+    tty: true
+    env_file:
+      - ./.env
+    volumes:
+      - /var/bigbluebutton:/var/bigbluebutton
+      - ./:/usr/src/app
+    command: bash -c "bundle exec ruby scripts/import.rb"

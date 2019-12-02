@@ -10,7 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_23_180008) do
+ActiveRecord::Schema.define(version: 2019_05_10_135222) do
+
+  create_table "data", force: :cascade do |t|
+    t.string "record_id"
+    t.json "raw_data"
+  end
 
   create_table "metadata", force: :cascade do |t|
     t.integer "recording_id"

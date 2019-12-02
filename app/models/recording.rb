@@ -1,8 +1,32 @@
+# == Schema Information
+#
+# Table name: recordings
+#
+#  id           :integer          not null, primary key
+#  record_id    :string
+#  meeting_id   :string
+#  name         :string
+#  published    :boolean
+#  participants :integer
+#  state        :string
+#  starttime    :datetime
+#  endtime      :datetime
+#  deleted_at   :datetime
+#
+
+require 'redis_publisher'
+
 class Recording < ApplicationRecord
   has_many :metadata, dependent: :destroy
   has_many :playback_formats, dependent: :destroy
+  has_one :datum, dependent: :destroy, inverse_of: 'recording', required: false
 
-  validates :state, inclusion: { in: %w[processing processed published unpublished deleted] }, allow_nil: true
+  validates :state, inclusion: { in: %w[processing processed published unpublished deleted] },
+                    allow_nil: true
+  validates :record_id, uniqueness: true
+
+  after_save :publish_to_redis_after_save
+  after_destroy :publish_to_redis_after_destroy
 
   scope :with_recording_id_prefixes, lambda { |recording_ids|
     return none if recording_ids.empty?
@@ -14,9 +38,8 @@ class Recording < ApplicationRecord
   }
 
   def self.sync_from_redis(message)
-    header = message["header"]
-    payload = message["payload"]
-    attrs = {}
+    header = message['header']
+    payload = message['payload']
 
     record_id = payload['record_id']
     Recording.transaction do
@@ -24,68 +47,118 @@ class Recording < ApplicationRecord
 
       recording.meeting_id = payload['external_meeting_id'] if payload.key?('external_meeting_id')
 
-      case header['name']
-      when /^archive_/, /^sanity_/, 'process_started'
-        recording.state = 'processing'
-        recording.published = false
-      when 'process_ended', 'publish_started'
-        recording.state = 'processed'
-        recording.published = false
-      when 'publish_ended'
-        recording.state = 'published'
-        recording.starttime = Time.at(Rational(payload['start_time'], 1000)).utc
-        recording.endtime = Time.at(Rational(payload['end_time'], 1000)).utc
-        recording.participants = payload['participants']
-        recording.published = true
-      end
+      # TODO: changing the states like this might be wrong if there's more than 1 playback format
+      update_recording_by_event_name(header['name'], recording, payload)
 
-      # override :published in case it's present in the event
-      recording.published = payload['publish'] if payload.key?('published')
-
+      # override attributes if present in the event
+      recording.published = payload['published'] if payload.key?('published')
       recording.name = payload['metadata']['meetingName'] if payload.key?('metadata')
-
       recording.save!
 
-      Metadatum.upsert_by_record_id(payload['record_id'], payload['metadata']) if payload.key?('metadata')
+      recording.sync_metadata_from_redis(payload['metadata']) if payload.key?('metadata')
+      recording.sync_playbacks_from_redis(payload['playback']) if payload.key?('playback')
+      recording
+    end
+  end
 
-      if payload.has_key?("playback")
-        playbacks = payload["playback"]
-        playbacks = [playbacks] unless playbacks.is_a?(Array)
+  def self.update_recording_by_event_name(event_name, recording, payload)
+    case event_name
+    when /^archive_/, /^sanity_/, 'process_started'
+      recording.state = 'processing'
+      recording.published = false
+    when 'process_ended', 'publish_started'
+      recording.state = 'processed'
+      recording.published = false
+    when 'publish_ended'
+      recording.state = 'published'
+      recording.starttime = Time.at(Rational(payload['start_time'], 1000)).utc
+      recording.endtime = Time.at(Rational(payload['end_time'], 1000)).utc
+      recording.participants = payload['participants']
+      recording.published = true
+    end
+  end
 
-        playbacks.each do |playback|
-          format = PlaybackFormat.find_or_create_by(recording: recording, format: playback["format"])
-          format.update_attributes(
-            url: URI(playback["link"]).request_uri,
-            length: playback["duration"],
-            processing_time: playback["processing_time"]
-          )
+  def self.metadata_updated(record_ids = [])
+    record_ids.each do |record_id|
+      rec = Recording.find_by(record_id: record_id)
+      rec.publish_metadata_to_redis if rec.present?
+    end
+  end
 
-          if playback.has_key?("extensions")
-            images = playback["extensions"]["preview"]["images"]["image"]
-            images = [images] unless images.is_a?(Array)
+  def publish_metadata_to_redis
+    RedisPublisher.recording_updated(self)
+  end
 
-            images.each_with_index do |image, i|
-              # newer versions of bbb have a different format
-              # old: {"images"=>{"image"=>["https://....png"]}}
-              # new: {"images"=>{"image"=>[{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}]}}
-              if image.is_a?(String)
-                image = { "link" => image }
-              end
+  def data_file_path
+    "/var/bigbluebutton/events/#{record_id}/data.json"
+  end
 
-              thumb = Thumbnail.find_or_create_by(
-                playback_format: format,
-                url: URI(image["link"]).request_uri
-              )
-              thumb.update_attributes(
-                width: image["width"],
-                height: image["height"],
-                alt: image["alt"],
-                sequence: i
-              )
-            end
-          end
-        end
+  def sync_metadata_from_redis(meta)
+    Metadatum.upsert_by_record_id(record_id, meta)
+  end
+
+  def sync_playbacks_from_redis(playbacks)
+    playbacks = [playbacks] unless playbacks.is_a?(Array)
+    playbacks.each do |playback|
+      sync_playback_from_redis(playback)
+    end
+  end
+
+  def sync_playback_from_redis(playback)
+    format = PlaybackFormat.find_or_create_by(recording: self, format: playback['format'])
+    format.update(
+      url: URI(playback['link'].strip).request_uri,
+      length: playback['duration'],
+      processing_time: playback['processing_time']
+    )
+
+    return unless playback.key?('extensions')
+
+    images = playback['extensions']['preview']['images']['image']
+    images = [images] unless images.is_a?(Array)
+    save_images(images, format)
+  end
+
+  def save_images(images, format)
+    images.each_with_index do |image, i|
+      # newer versions of bbb have a different format
+      # old: {"images"=>{"image"=>["https://....png"]}}
+      # new: {"images"=>{"image"=>[{"width"=>"176", "height"=>"136", "alt"=>"", "link"=>"https://....png"}]}}
+      image = { 'link' => image } if image.is_a?(String)
+
+      begin
+        url = URI(image['link'].strip).request_uri
+      rescue URI::InvalidURIError
+        Rails.logger.warn("Invalid URL '#{image['link'].strip}'")
+      end
+      thumb = Thumbnail.find_or_create_by(
+        playback_format: format,
+        url: url
+      )
+      thumb.update(
+        width: image['width'],
+        height: image['height'],
+        alt: image['alt'],
+        sequence: i
+      )
+    end
+  end
+
+  private
+
+  def publish_to_redis_after_save
+    if saved_changes.include?('state') && saved_changes['state'][1] == 'deleted'
+      RedisPublisher.recording_deleted(self)
+    elsif saved_changes.include?('published')
+      if published?
+        RedisPublisher.recording_published(self)
+      else
+        RedisPublisher.recording_unpublished(self)
       end
     end
+  end
+
+  def publish_to_redis_after_destroy
+    RedisPublisher.recording_deleted(self)
   end
 end

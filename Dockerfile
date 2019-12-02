@@ -1,7 +1,12 @@
 FROM ruby:2.5
 
+# We need sqlite > 3.24 so we install it from backports
+RUN echo "deb http://http.debian.net/debian stretch-backports main contrib non-free" > /etc/apt/sources.list.d/stretch-backports.list
+
 # Install app dependencies.
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs
+RUN apt-get update -qq && \
+  apt-get install -y build-essential libpq-dev nodejs && \
+  apt-get install -y -t stretch-backports libsqlite3-0
 
 # Set an environment variable for the install location.
 ENV RAILS_ROOT /usr/src/app
