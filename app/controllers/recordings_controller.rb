@@ -1,6 +1,8 @@
 class RecordingsController < ApplicationController
   before_action :parse_metadata
 
+  skip_before_action :checksum, only: :authorizeRecording
+
   def getRecordings
     query = Recording.includes(playback_formats: [:thumbnails], metadata: [])
     if params[:recordID].present?
@@ -87,5 +89,14 @@ class RecordingsController < ApplicationController
 
     @deleted = destroyed_recs.count.positive?
     render :delete_recordings
+  end
+
+  def authorizeRecording
+    rec = Recording.find_by(record_id: params[:meetingId])
+    if rec.present? && rec.published
+      head(200)
+    else
+      head(403)
+    end
   end
 end

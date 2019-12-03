@@ -17,6 +17,10 @@ Rails.application.routes.draw do
       to: 'recordings#deleteRecordings',
       as: 'recordings_delete_recordings',
       defaults: { format: 'xml' }
+  get "#{base}/authorizeRecording",
+      to: 'recordings#authorizeRecording',
+      as: 'recordings_authorize_recording',
+      defaults: { format: 'xml' }
 
   get "#{base}/getData",
       to: 'data#getData',
