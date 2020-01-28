@@ -2,3 +2,4 @@ config/master.key
 log/*
 tmp/*
 db/*.sqlite3
+vendor/bundle

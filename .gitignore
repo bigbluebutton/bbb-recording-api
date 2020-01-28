@@ -28,4 +28,7 @@
 
 /vendor
 
-.env.local
+.env*.local
+
+# For people using rbenv to develop against non-system ruby
+.ruby-version
